@@ -1,0 +1,27 @@
+{
+  "name": "algoflow",
+  "version": "1.0.0",
+  "description": "WIP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NaturalIntelligence/algoflow.git"
+  },
+  "keywords": [],
+  "author": "Amit Gupta (https://solothought.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NaturalIntelligence/algoflow/issues"
+  },
+  "homepage": "https://github.com/NaturalIntelligence/algoflow#readme",
+  "funding": [{
+    "type": "github",
+    "url": "https://github.com/sponsors/NaturalIntelligence"
+  },{
+    "type": "paypal",
+    "url": "https://paypal.me/naturalintelligence"
+  }],
+}
