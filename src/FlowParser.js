@@ -9,7 +9,7 @@ class FlowParser {
   }
 
   parse(flowText) {
-    this.lines = flowText.trim().split('\n');
+    this.lines = flowText.split('\n');
     this.parseFlow();
     return this.flows;
   }
@@ -18,19 +18,22 @@ class FlowParser {
     console.log("reading flow");
 
     for (; this.lineIndex < this.lines.length; this.lineIndex++) {
-      const line = this.lines[this.lineIndex].trim();
-      if (!line) continue; // Skip empty lines
 
-      const indentLevel = line.search(/\S/);
-      if (line.startsWith('FLOW:')) {
-        const flowName = line.substring(6).trim();
+      const line = this.lines[this.lineIndex];
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue; // Skip empty lines
+
+      if (trimmedLine.startsWith('FLOW:')) {
+        const flowName = trimmedLine.substring(6);
         console.log("flow", flowName);
-
+        
         this.currentFlow = new Flow(flowName);
         this.flows[flowName] = this.currentFlow;
         this.lineIndex++; // Move to next line to process headers and statements
         this.parseHeaders(); // Parse headers
-        this.currentFlow.steps = this.parseSteps(indentLevel); // Start parsing with initial indent level
+
+        const indentation = this.lines[this.lineIndex].search(/\S/); // Find first non-space character
+        this.currentFlow.steps = this.parseSteps(-1); // Start parsing with initial indent level
       }
     }
   }
@@ -56,8 +59,8 @@ class FlowParser {
     }
   }
 
-  parseSteps(level) {
-    console.log("reading level: ", level);
+  parseSteps(parentIndentation) {
+    console.log("reading indentation: ", parentIndentation);
 
     let nestedLastSteps = []; // to point next step in upper level
     let lastStep = null;      // to point next step in current level, to set  exitStep
@@ -77,8 +80,7 @@ class FlowParser {
       if (trimmedLine.startsWith('FLOW:')) {
         this.lineIndex--; // Roll back to reprocess this line in the outer loop
         break;
-      }else if(indentLevel < level){
-        console.log("reading level: ", indentLevel);
+      }else if(indentLevel <= parentIndentation){
         this.lineIndex--;
         break; //this level is done
       } //else
@@ -96,12 +98,12 @@ class FlowParser {
 
       // process step
       if(stepType === "ELSE_IF"){
-        const nestedSteps = this.parseSteps(level+1);
+        const nestedSteps = this.parseSteps(indentLevel);
         currentStep.nextStep.push(nestedSteps.entryStep);
         if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
       }else if(stepType === "ELSE"){
         // skip unnecessary ELSE step 
-        const nestedSteps = this.parseSteps(level+1);
+        const nestedSteps = this.parseSteps(indentLevel);
         lastStep.nextStep.push(nestedSteps.entryStep);
         if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
       }else{
@@ -114,12 +116,12 @@ class FlowParser {
         nestedLastSteps = [];
 
         if(stepType === "IF"){
-          const nestedSteps = this.parseSteps(level+1);
+          const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
           if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
         }else if(stepType === "LOOP"){
           // LOOP is a IF step where last step points to IF back
-          const nestedSteps = this.parseSteps(level+1);
+          const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
           nestedSteps.exitStep = currentStep;
           if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
@@ -147,7 +149,8 @@ class FlowParser {
         }
       }
     }//End Loop
-    return { entryStep: entryStep, exitStep: lastStep};
+    console.log("leaving indentation ", parentIndentation)
+    return { entryStep: entryStep, exitStep: currentStep};
   }
 
 }

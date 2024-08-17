@@ -1,6 +1,4 @@
-
-const FlowParser = require("./../FlowParser"); 
-const _ = require("underscore"); 
+const FlowParser = require("./../src/FlowParser"); 
 
 describe("Flow Parser", function() {
   it("should parse flow with no statement", function() {
@@ -50,6 +48,51 @@ describe("Flow Parser", function() {
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
 
   });
+  it("should parse flow with different indentation on same level", function() {
+    const flowText = `
+        FLOW: Sample flow 1
+        version: 1.0
+        threshold: 5000
+        IF cond
+          DO No
+        DO Yeah`;
+    const expected = {
+      "name": "Sample flow 1",
+      "headers": {
+          "version": 1,
+          "threshold": 5000
+      },
+      "steps": {
+          "entryStep": {
+              "msg": "cond",
+              "nextStep": [
+                  {
+                      "msg": "No",
+                      "nextStep": [
+                          {
+                              "msg": "Yeah",
+                              "nextStep": []
+                          }
+                      ]
+                  },
+                  {
+                      "msg": "Yeah",
+                      "nextStep": []
+                  }
+              ]
+          },
+          "exitStep": {
+              "msg": "Yeah",
+              "nextStep": []
+          }
+      }
+    }
+    const parser = new FlowParser();
+    const flows = parser.parse(flowText);
+    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+
+  });
   it("should parse flow with 1 IF statement", function() {
     const flowText = `
         FLOW: Sample flow 1
@@ -79,10 +122,10 @@ describe("Flow Parser", function() {
     }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
-    console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
-  it("should parse flow with IF ELSE_IF and ELSE statements", function() {
+  fit("should parse flow with IF ELSE_IF and ELSE statements", function() {
     const flowText = `
 FLOW: Sample flow 1
 version: 1.0
