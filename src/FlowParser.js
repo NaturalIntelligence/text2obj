@@ -6,6 +6,7 @@ class FlowParser {
     this.currentFlow = null;
     this.lineIndex = 0;
     this.lines = [];
+    this.counter = 0;
   }
 
   parse(flowText) {
@@ -27,12 +28,12 @@ class FlowParser {
         const flowName = trimmedLine.substring(6);
         console.log("flow", flowName);
         
+        this.counter = 0;
         this.currentFlow = new Flow(flowName);
         this.flows[flowName] = this.currentFlow;
         this.lineIndex++; // Move to next line to process headers and statements
         this.parseHeaders(); // Parse headers
 
-        const indentation = this.lines[this.lineIndex].search(/\S/); // Find first non-space character
         this.currentFlow.steps = this.parseSteps(-1); // Start parsing with initial indent level
       }
     }
@@ -89,7 +90,8 @@ class FlowParser {
       const [stepType, stepMsg] = readStep(trimmedLine);
 
       // exchange pointers
-      currentStep = new Step(stepMsg);
+      currentStep = new Step(stepMsg, this.counter++);
+      this.currentFlow.index[this.counter] = currentStep; //To support GOTO
       if(lastStep) {
         if(stepType !== "ELSE") 
           lastStep.nextStep.push(currentStep); // false branch
@@ -150,7 +152,7 @@ class FlowParser {
       }
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
-    return { entryStep: entryStep, exitStep: currentStep};
+    return new Level( entryStep, currentStep);
   }
 
 }

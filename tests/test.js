@@ -1,4 +1,5 @@
 const FlowParser = require("./../src/FlowParser"); 
+const {customDeepEqual} = require("./util"); 
 
 describe("Flow Parser", function() {
   it("should parse flow with no statement", function() {
@@ -7,16 +8,17 @@ describe("Flow Parser", function() {
         version: 1.0
         threshold: 5000`;
     const expected = {
-          "name": "Sample flow 1",
-          "headers": {
-              "version": 1,
-              "threshold": 5000
-          },
-          "steps": {
-              "entryStep": null,
-              "exitStep": null
-          }
-      }
+      "name": "Sample flow 1",
+      "headers": {
+          "version": 1,
+          "threshold": 5000
+      },
+      "steps": {
+          "entryStep": null,
+          "exitStep": null
+      },
+      "index": {}
+    };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -29,19 +31,31 @@ describe("Flow Parser", function() {
         threshold: 5000
         DO Yes`;
     const expected = {
-          "name": "Sample flow 1",
-          "headers": {
-              "version": 1,
-              "threshold": 5000
+      "name": "Sample flow 1",
+      "headers": {
+          "version": 1,
+          "threshold": 5000
+      },
+      "steps": {
+          "entryStep": {
+              "msg": "Yes",
+              "nextStep": [],
+              "index": 0
           },
-          "steps": {
-              "entryStep": {
-                "msg": "Yes",
-                "nextStep": []
-            },
-              "exitStep": null
+          "exitStep": {
+              "msg": "Yes",
+              "nextStep": [],
+              "index": 0
+          }
+      },
+      "index": {
+          "1": {
+              "msg": "Yes",
+              "nextStep": [],
+              "index": 0
           }
       }
+    }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -56,41 +70,39 @@ describe("Flow Parser", function() {
         IF cond
           DO No
         DO Yeah`;
-    const expected = {
-      "name": "Sample flow 1",
-      "headers": {
-          "version": 1,
-          "threshold": 5000
+    const expectedSteps = {
+      "entryStep": {
+          "msg": "cond",
+          "nextStep": [
+              {
+                  "msg": "No",
+                  "nextStep": [
+                      {
+                          "msg": "Yeah",
+                          "nextStep": [],
+                          "index": 2
+                      }
+                  ],
+                  "index": 1
+              },
+              {
+                  "msg": "Yeah",
+                  "nextStep": [],
+                  "index": 2
+              }
+          ],
+          "index": 0
       },
-      "steps": {
-          "entryStep": {
-              "msg": "cond",
-              "nextStep": [
-                  {
-                      "msg": "No",
-                      "nextStep": [
-                          {
-                              "msg": "Yeah",
-                              "nextStep": []
-                          }
-                      ]
-                  },
-                  {
-                      "msg": "Yeah",
-                      "nextStep": []
-                  }
-              ]
-          },
-          "exitStep": {
-              "msg": "Yeah",
-              "nextStep": []
-          }
+      "exitStep": {
+          "msg": "Yeah",
+          "nextStep": [],
+          "index": 2
       }
-    }
+  }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"].steps,expectedSteps)).toBeTrue();
 
   });
   it("should parse flow with 1 IF statement", function() {
@@ -113,11 +125,41 @@ describe("Flow Parser", function() {
               "nextStep": [
                   {
                       "msg": "Yes",
-                      "nextStep": []
+                      "nextStep": [],
+                      "index": 1
                   }
-              ]
+              ],
+              "index": 0
           },
-          "exitStep": null
+          "exitStep": {
+              "msg": "condition",
+              "nextStep": [
+                  {
+                      "msg": "Yes",
+                      "nextStep": [],
+                      "index": 1
+                  }
+              ],
+              "index": 0
+          }
+      },
+      "index": {
+          "1": {
+              "msg": "condition",
+              "nextStep": [
+                  {
+                      "msg": "Yes",
+                      "nextStep": [],
+                      "index": 1
+                  }
+              ],
+              "index": 0
+          },
+          "2": {
+              "msg": "Yes",
+              "nextStep": [],
+              "index": 1
+          }
       }
     }
     const parser = new FlowParser();
@@ -125,7 +167,7 @@ describe("Flow Parser", function() {
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
-  fit("should parse flow with IF ELSE_IF and ELSE statements", function() {
+  it("should parse flow with IF ELSE_IF and ELSE statements", function() {
     const flowText = `
 FLOW: Sample flow 1
 version: 1.0
@@ -139,66 +181,67 @@ ELSE
   DO D
 DO E`;
     const expected = {
-      "name": "Sample flow 1",
-      "headers": {
-          "version": 1,
-          "threshold": 5000
-      },
-      "steps": {
-          "entryStep": {
-              "msg": "condition",
-              "nextStep": [
-                  {
-                      "msg": "Yes",
-                      "nextStep": []
-                  }
-              ]
-          },
-          "exitStep": null
-      }
-    }
+        "entryStep": {
+            "msg": "A",
+            "nextStep": [
+                {
+                    "msg": "condition 1",
+                    "nextStep": [
+                        {
+                            "msg": "C",
+                            "nextStep": [
+                                {
+                                    "msg": "E",
+                                    "nextStep": [],
+                                    "index": 7
+                                }
+                            ],
+                            "index": 2
+                        },
+                        {
+                            "msg": "condition 2",
+                            "nextStep": [
+                                {
+                                    "msg": "K",
+                                    "nextStep": [
+                                        {
+                                            "msg": "E",
+                                            "nextStep": [],
+                                            "index": 7
+                                        }
+                                    ],
+                                    "index": 4
+                                },
+                                {
+                                    "msg": "D",
+                                    "nextStep": [
+                                        {
+                                            "msg": "E",
+                                            "nextStep": [],
+                                            "index": 7
+                                        }
+                                    ],
+                                    "index": 6
+                                }
+                            ],
+                            "index": 3
+                        }
+                    ],
+                    "index": 1
+                }
+            ],
+            "index": 0
+        },
+        "exitStep": {
+            "msg": "E",
+            "nextStep": [],
+            "index": 7
+        }
+      };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
-    console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
   });
 });
 
-
-function customDeepEqual(actual, expected) {
-  // if (typeof actual !== typeof expected) {
-  //   return false;
-  // }
-  if (Array.isArray(actual) && Array.isArray(expected)) {
-    if (actual.length !== expected.length) {
-      
-      return false;
-    }
-    for (let i = 0; i < actual.length; i++) {
-      if (!customDeepEqual(actual[i], expected[i])) {
-        console.error("Assertion failed: ",actual[i], expected[i], "not matching")
-        return false;
-      }
-    }
-  } else if (typeof actual === 'object') {
-    if(actual === null || expected === null){
-      if(actual === expected) return true;
-      console.error("Assertion failed: ", actual, expected, "not matching")
-      return false;
-    }
-    const actualKeys = Object.keys(actual);
-    const expectedKeys = Object.keys(expected);
-    if (actualKeys.length !== expectedKeys.length) {
-      return false;
-    }
-    for (const key of actualKeys) {
-      if (!customDeepEqual(actual[key], expected[key])) {
-        console.error("Assertion failed: ",actual[key], expected[key], "not matching")
-        return false;
-      }
-    }
-  } else {
-    return actual === expected;
-  }
-  return true;
-}
