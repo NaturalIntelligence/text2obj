@@ -40,19 +40,22 @@ describe("Flow Parser", function() {
           "entryStep": {
               "msg": "Yes",
               "nextStep": [],
-              "index": 0
+              "index": 0,
+              "type": "DO"
           },
           "exitStep": {
               "msg": "Yes",
               "nextStep": [],
-              "index": 0
+              "index": 0,
+              "type": "DO"
           }
       },
       "index": {
           "1": {
               "msg": "Yes",
               "nextStep": [],
-              "index": 0
+              "index": 0,
+              "type": "DO"
           }
       }
     }
@@ -80,25 +83,30 @@ describe("Flow Parser", function() {
                       {
                           "msg": "Yeah",
                           "nextStep": [],
-                          "index": 2
+                          "index": 2,
+                          "type": "DO"
                       }
                   ],
-                  "index": 1
+                  "index": 1,
+                  "type": "DO"
               },
               {
                   "msg": "Yeah",
                   "nextStep": [],
-                  "index": 2
+                  "index": 2,
+                  "type": "DO"
               }
           ],
-          "index": 0
+          "index": 0,
+          "type": "IF"
       },
       "exitStep": {
           "msg": "Yeah",
           "nextStep": [],
-          "index": 2
+          "index": 2,
+          "type": "DO"
       }
-  }
+    }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -108,8 +116,6 @@ describe("Flow Parser", function() {
   it("should parse flow with 1 IF statement", function() {
     const flowText = `
         FLOW: Sample flow 1
-        version: 1.0
-        threshold: 5000
         IF condition
           DO Yes
         `;
@@ -117,7 +123,7 @@ describe("Flow Parser", function() {
       "name": "Sample flow 1",
       "headers": {
           "version": 1,
-          "threshold": 5000
+          "threshold": 7000
       },
       "steps": {
           "entryStep": {
@@ -126,10 +132,12 @@ describe("Flow Parser", function() {
                   {
                       "msg": "Yes",
                       "nextStep": [],
-                      "index": 1
+                      "index": 1,
+                      "type": "DO"
                   }
               ],
-              "index": 0
+              "index": 0,
+              "type": "IF"
           },
           "exitStep": {
               "msg": "condition",
@@ -137,10 +145,12 @@ describe("Flow Parser", function() {
                   {
                       "msg": "Yes",
                       "nextStep": [],
-                      "index": 1
+                      "index": 1,
+                      "type": "DO"
                   }
               ],
-              "index": 0
+              "index": 0,
+              "type": "IF"
           }
       },
       "index": {
@@ -150,15 +160,18 @@ describe("Flow Parser", function() {
                   {
                       "msg": "Yes",
                       "nextStep": [],
-                      "index": 1
+                      "index": 1,
+                      "type": "DO"
                   }
               ],
-              "index": 0
+              "index": 0,
+              "type": "IF"
           },
           "2": {
               "msg": "Yes",
               "nextStep": [],
-              "index": 1
+              "index": 1,
+              "type": "DO"
           }
       }
     }
@@ -181,63 +194,73 @@ ELSE
   DO D
 DO E`;
     const expected = {
-        "entryStep": {
-            "msg": "A",
-            "nextStep": [
-                {
-                    "msg": "condition 1",
-                    "nextStep": [
-                        {
-                            "msg": "C",
-                            "nextStep": [
-                                {
-                                    "msg": "E",
-                                    "nextStep": [],
-                                    "index": 7
-                                }
-                            ],
-                            "index": 2
-                        },
-                        {
-                            "msg": "condition 2",
-                            "nextStep": [
-                                {
-                                    "msg": "K",
-                                    "nextStep": [
-                                        {
-                                            "msg": "E",
-                                            "nextStep": [],
-                                            "index": 7
-                                        }
-                                    ],
-                                    "index": 4
-                                },
-                                {
-                                    "msg": "D",
-                                    "nextStep": [
-                                        {
-                                            "msg": "E",
-                                            "nextStep": [],
-                                            "index": 7
-                                        }
-                                    ],
-                                    "index": 6
-                                }
-                            ],
-                            "index": 3
-                        }
-                    ],
-                    "index": 1
-                }
-            ],
-            "index": 0
-        },
-        "exitStep": {
-            "msg": "E",
-            "nextStep": [],
-            "index": 7
-        }
-      };
+      "entryStep": {
+          "msg": "A",
+          "nextStep": [
+              {
+                  "msg": "condition 1",
+                  "nextStep": [
+                      {
+                          "msg": "C",
+                          "nextStep": [
+                              {
+                                  "msg": "E",
+                                  "nextStep": [],
+                                  "index": 7,
+                                  "type": "DO"
+                              }
+                          ],
+                          "index": 2,
+                          "type": "DO"
+                      },
+                      {
+                          "msg": "condition 2",
+                          "nextStep": [
+                              {
+                                  "msg": "K",
+                                  "nextStep": [
+                                      {
+                                          "msg": "E",
+                                          "nextStep": [],
+                                          "index": 7,
+                                          "type": "DO"
+                                      }
+                                  ],
+                                  "index": 4,
+                                  "type": "DO"
+                              },
+                              {
+                                  "msg": "D",
+                                  "nextStep": [
+                                      {
+                                          "msg": "E",
+                                          "nextStep": [],
+                                          "index": 7,
+                                          "type": "DO"
+                                      }
+                                  ],
+                                  "index": 6,
+                                  "type": "DO"
+                              }
+                          ],
+                          "index": 3,
+                          "type": "ELSE_IF"
+                      }
+                  ],
+                  "index": 1,
+                  "type": "IF"
+              }
+          ],
+          "index": 0,
+          "type": "DO"
+      },
+      "exitStep": {
+          "msg": "E",
+          "nextStep": [],
+          "index": 7,
+          "type": "DO"
+      }
+    }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));

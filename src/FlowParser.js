@@ -90,7 +90,7 @@ class FlowParser {
       const [stepType, stepMsg] = readStep(trimmedLine);
 
       // exchange pointers
-      currentStep = new Step(stepMsg, this.counter++);
+      currentStep = new Step(stepType, stepMsg, this.counter++);
       this.currentFlow.index[this.counter] = currentStep; //To support GOTO
       if(lastStep) {
         if(stepType !== "ELSE") 
