@@ -63,7 +63,7 @@ class FlowParser {
   parseSteps(parentIndentation) {
     console.log("reading indentation: ", parentIndentation);
 
-    let nestedLastSteps = []; // to point next step in upper level
+    let nestedExitSteps = []; // to point next step in upper level
     let lastStep = null;      // to point next step in current level, to set  exitStep
     let currentStep = null;   // for processing current step
     let entryStep = null;     // to set entry step of current level
@@ -90,8 +90,11 @@ class FlowParser {
       const [stepType, stepMsg] = readStep(trimmedLine);
 
       // exchange pointers
-      currentStep = new Step(stepType, stepMsg, this.counter++);
+      // using counter instead of line index so that
+      //  - empty lines and multiple flows don't impact the index 
+      currentStep = new Step(stepType, stepMsg, this.counter);
       this.currentFlow.index[this.counter] = currentStep; //To support GOTO
+      this.counter++;
       if(lastStep) {
         if(stepType !== "ELSE") 
           lastStep.nextStep.push(currentStep); // false branch
@@ -102,31 +105,33 @@ class FlowParser {
       if(stepType === "ELSE_IF"){
         const nestedSteps = this.parseSteps(indentLevel);
         currentStep.nextStep.push(nestedSteps.entryStep);
-        if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
+        if(nestedSteps.exitStep) nestedExitSteps.push(nestedSteps.exitStep);
       }else if(stepType === "ELSE"){
         // skip unnecessary ELSE step 
         const nestedSteps = this.parseSteps(indentLevel);
         lastStep.nextStep.push(nestedSteps.entryStep);
-        if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
+        if(nestedSteps.exitStep) nestedExitSteps.push(nestedSteps.exitStep);
       }else{
         //point all nestedLastSteps to current Step
-        nestedLastSteps.forEach(step => {
+        nestedExitSteps.forEach(step => {
           console.log("settling: ",step.msg)
           console.log(currentStep.msg)
           step.nextStep.push(currentStep);
         });
-        nestedLastSteps = [];
+        nestedExitSteps = [];
 
         if(stepType === "IF"){
           const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
-          if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
+          if(nestedSteps.exitStep) nestedExitSteps.push(nestedSteps.exitStep);
         }else if(stepType === "LOOP"){
           // LOOP is a IF step where last step points to IF back
           const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
-          nestedSteps.exitStep = currentStep;
-          if(nestedSteps.exitStep) nestedLastSteps.push(nestedSteps.exitStep);
+          if(nestedSteps.exitStep) {
+            // nestedExitSteps.push(nestedSteps.exitStep);
+            nestedSteps.exitStep.nextStep.push(currentStep);
+          }
         }else if(stepType === "END"){
           currentStep.nextStep = [];
           // For validation purpose, we can just step a flag and throw error if next statement is found
@@ -144,7 +149,7 @@ class FlowParser {
             const flowSteps = flow.steps;
             currentStep.nextStep.push(nestedSteps.entryStep);
             nestedSteps.exitStep = currentStep;
-            nestedLastSteps.push(nestedSteps.exitStep);
+            nestedExitSteps.push(nestedSteps.exitStep);
           }
         }else if(!isSupportedKeyword(stepType)){
           throw Error(stepType, " is not supported");
