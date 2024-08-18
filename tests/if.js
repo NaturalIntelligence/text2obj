@@ -1,5 +1,5 @@
-const FlowParser = require("./../src/FlowParser"); 
-const {customDeepEqual} = require("./util"); 
+const FlowParser = require("../src/FlowParser"); 
+const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
   it("should parse flow with no statement", function() {
@@ -51,7 +51,7 @@ describe("Flow Parser", function() {
           }
       },
       "index": {
-          "1": {
+          "0": {
               "msg": "Yes",
               "nextStep": [],
               "index": 0,
@@ -61,7 +61,7 @@ describe("Flow Parser", function() {
     }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
-    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
 
   });
@@ -154,7 +154,7 @@ describe("Flow Parser", function() {
           }
       },
       "index": {
-          "1": {
+          "0": {
               "msg": "condition",
               "nextStep": [
                   {
@@ -167,7 +167,7 @@ describe("Flow Parser", function() {
               "index": 0,
               "type": "IF"
           },
-          "2": {
+          "1": {
               "msg": "Yes",
               "nextStep": [],
               "index": 1,
@@ -179,6 +179,60 @@ describe("Flow Parser", function() {
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+  });
+  it("should parse flow with nested IF statement", function() {
+    const flowText = `
+        FLOW: Sample flow 1
+        IF condition 1
+            IF condition 2
+                DO Yes
+        DO No
+        `;
+    const expected = {
+        "entryStep": {
+            "msg": "condition 1",
+            "nextStep": [
+                {
+                    "msg": "condition 2",
+                    "nextStep": [
+                        {
+                            "msg": "Yes",
+                            "nextStep": [],
+                            "index": 2,
+                            "type": "DO"
+                        },
+                        {
+                            "msg": "No",
+                            "nextStep": [],
+                            "index": 3,
+                            "type": "DO"
+                        }
+                    ],
+                    "index": 1,
+                    "type": "IF"
+                },
+                {
+                    "msg": "No",
+                    "nextStep": [],
+                    "index": 3,
+                    "type": "DO"
+                }
+            ],
+            "index": 0,
+            "type": "IF"
+        },
+        "exitStep": {
+            "msg": "No",
+            "nextStep": [],
+            "index": 3,
+            "type": "DO"
+        }
+    }
+    const parser = new FlowParser();
+    const flows = parser.parse(flowText);
+    // console.log(toSafeString(flows["Sample flow 1"]));
+    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
   });
   it("should parse flow with IF ELSE_IF and ELSE statements", function() {
     const flowText = `
@@ -263,6 +317,7 @@ DO E`;
     }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
+    // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
   });
