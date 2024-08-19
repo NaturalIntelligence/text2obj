@@ -22,7 +22,7 @@ describe("Flow Parser", function() {
           "index": 0,
           "type": "DO"
         },
-        "exitStep": "Point to step 0: DO A"
+        "exitStep": ["Point to step 0: DO A"]
       },
       "index": {
         "0": "Point to step 0: DO A"
@@ -57,7 +57,7 @@ describe("Flow Parser", function() {
         "index": 0,
         "type": "IF"
       },
-      "exitStep": "Point to step 1: DO B"
+      "exitStep": ["Point to step 1: DO B"]
     };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
@@ -88,7 +88,7 @@ describe("Flow Parser", function() {
         "index": 0,
         "type": "LOOP"
       },
-      "exitStep": "Point to step 1: DO D"
+      "exitStep": ["Point to step 1: DO D"]
     };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);

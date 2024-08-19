@@ -63,7 +63,7 @@ class FlowParser {
   parseSteps(parentIndentation) {
     console.log("reading indentation: ", parentIndentation);
 
-    let nestedExitSteps = []; // to point next step in upper level
+    let exitSteps = []; // to point next step in upper level
     let lastStep = null;      // to point next step in current level, to set  exitStep
     let currentStep = null;   // for processing current step
     let entryStep = null;     // to set entry step of current level
@@ -90,6 +90,9 @@ class FlowParser {
       const [stepType, stepMsg] = readStep(trimmedLine);
 
       if(stepType === "END") break;
+      else if(stepType === "SKIP") {
+        // point current node to loop back
+      }
       // exchange pointers
       // using counter instead of line index so that
       //  - empty lines and multiple flows don't impact the index 
@@ -106,32 +109,33 @@ class FlowParser {
       if(stepType === "ELSE_IF"){
         const nestedSteps = this.parseSteps(indentLevel);
         currentStep.nextStep.push(nestedSteps.entryStep);
-        if(nestedSteps.exitStep) nestedExitSteps.push(nestedSteps.exitStep);
+        if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
       }else if(stepType === "ELSE"){
         // skip unnecessary ELSE step 
         const nestedSteps = this.parseSteps(indentLevel);
         lastStep.nextStep.push(nestedSteps.entryStep);
-        if(nestedSteps.exitStep) nestedExitSteps.push(nestedSteps.exitStep);
+        if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
       }else{
         //point all nestedLastSteps to current Step
-        nestedExitSteps.forEach(step => {
-          console.log("settling: ",step.msg)
-          console.log(currentStep.msg)
-          step.nextStep.push(currentStep);
+        exitSteps.forEach(step => {
+          //to exclude END steps
+          if(step) step.nextStep.push(currentStep);
         });
-        nestedExitSteps = [];
+        exitSteps = [];
 
         if(stepType === "IF"){
           const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
-          if(nestedSteps.exitStep) nestedExitSteps.push(nestedSteps.exitStep);
+          if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
         }else if(stepType === "LOOP"){
           // LOOP is a IF step where last step points to IF back
           const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
           if(nestedSteps.exitStep) {
-            // nestedExitSteps.push(nestedSteps.exitStep);
-            nestedSteps.exitStep.nextStep.push(currentStep);
+            nestedSteps.exitStep.forEach(step => {
+              //to exclude END steps
+              if(step) step.nextStep.push(currentStep);
+            });
           }
         }else if(stepType === "FOLLOW"){
           const flow = this.flows[stepMsg];
@@ -146,7 +150,7 @@ class FlowParser {
             const flowSteps = flow.steps;
             currentStep.nextStep.push(nestedSteps.entryStep);
             nestedSteps.exitStep = currentStep;
-            nestedExitSteps.push(nestedSteps.exitStep);
+            exitSteps.concat(nestedSteps.exitStep);
           }
         }else if(!isSupportedKeyword(stepType)){
           throw Error(stepType, " is not supported");
@@ -154,7 +158,8 @@ class FlowParser {
       }
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
-    return new Level( entryStep, currentStep);
+    exitSteps.push(currentStep)
+    return new Level( entryStep, exitSteps);
   }
 
 }

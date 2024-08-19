@@ -15,7 +15,7 @@ describe("Flow Parser", function() {
       },
       "steps": {
           "entryStep": null,
-          "exitStep": null
+          "exitStep": [null]
       },
       "index": {}
     };
@@ -43,12 +43,12 @@ describe("Flow Parser", function() {
               "index": 0,
               "type": "DO"
           },
-          "exitStep": {
+          "exitStep": [{
               "msg": "Yes",
               "nextStep": [],
               "index": 0,
               "type": "DO"
-          }
+          }]
       },
       "index": {
           "0": {
@@ -61,7 +61,7 @@ describe("Flow Parser", function() {
     }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
-    console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
 
   });
@@ -100,15 +100,16 @@ describe("Flow Parser", function() {
           "index": 0,
           "type": "IF"
       },
-      "exitStep": {
+      "exitStep": [{
           "msg": "Yeah",
           "nextStep": [],
           "index": 2,
           "type": "DO"
-      }
+      }]
     }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
+    // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"].steps,expectedSteps)).toBeTrue();
 
@@ -120,63 +121,38 @@ describe("Flow Parser", function() {
           DO Yes
         `;
     const expected = {
-      "name": "Sample flow 1",
-      "headers": {
+        "name": "Sample flow 1",
+        "headers": {
           "version": 1,
           "threshold": 7000
-      },
-      "steps": {
+        },
+        "steps": {
           "entryStep": {
-              "msg": "condition",
-              "nextStep": [
-                  {
-                      "msg": "Yes",
-                      "nextStep": [],
-                      "index": 1,
-                      "type": "DO"
-                  }
-              ],
-              "index": 0,
-              "type": "IF"
+            "msg": "condition",
+            "nextStep": [
+              {
+                "msg": "Yes",
+                "nextStep": [],
+                "index": 1,
+                "type": "DO"
+              }
+            ],
+            "index": 0,
+            "type": "IF"
           },
-          "exitStep": {
-              "msg": "condition",
-              "nextStep": [
-                  {
-                      "msg": "Yes",
-                      "nextStep": [],
-                      "index": 1,
-                      "type": "DO"
-                  }
-              ],
-              "index": 0,
-              "type": "IF"
-          }
-      },
-      "index": {
-          "0": {
-              "msg": "condition",
-              "nextStep": [
-                  {
-                      "msg": "Yes",
-                      "nextStep": [],
-                      "index": 1,
-                      "type": "DO"
-                  }
-              ],
-              "index": 0,
-              "type": "IF"
-          },
-          "1": {
-              "msg": "Yes",
-              "nextStep": [],
-              "index": 1,
-              "type": "DO"
-          }
+          "exitStep": [
+            "Point to step 1: DO Yes",
+            "Point to step 0: IF condition"
+          ]
+        },
+        "index": {
+          "0": "Point to step 0: IF condition",
+          "1": "Point to step 1: DO Yes"
+        }
       }
-    }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
+    console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
@@ -190,44 +166,38 @@ describe("Flow Parser", function() {
         `;
     const expected = {
         "entryStep": {
-            "msg": "condition 1",
-            "nextStep": [
+          "msg": "condition 1",
+          "nextStep": [
+            {
+              "msg": "condition 2",
+              "nextStep": [
                 {
-                    "msg": "condition 2",
-                    "nextStep": [
-                        {
-                            "msg": "Yes",
-                            "nextStep": [],
-                            "index": 2,
-                            "type": "DO"
-                        },
-                        {
-                            "msg": "No",
-                            "nextStep": [],
-                            "index": 3,
-                            "type": "DO"
-                        }
-                    ],
-                    "index": 1,
-                    "type": "IF"
+                  "msg": "Yes",
+                  "nextStep": [
+                    {
+                      "msg": "No",
+                      "nextStep": [],
+                      "index": 3,
+                      "type": "DO"
+                    }
+                  ],
+                  "index": 2,
+                  "type": "DO"
                 },
-                {
-                    "msg": "No",
-                    "nextStep": [],
-                    "index": 3,
-                    "type": "DO"
-                }
-            ],
-            "index": 0,
-            "type": "IF"
+                "Point to step 3: DO No"
+              ],
+              "index": 1,
+              "type": "IF"
+            },
+            "Point to step 3: DO No"
+          ],
+          "index": 0,
+          "type": "IF"
         },
-        "exitStep": {
-            "msg": "No",
-            "nextStep": [],
-            "index": 3,
-            "type": "DO"
-        }
-    }
+        "exitStep": [
+          "Point to step 3: DO No"
+        ]
+      }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
@@ -248,73 +218,60 @@ ELSE
   DO D
 DO E`;
     const expected = {
-      "entryStep": {
+        "entryStep": {
           "msg": "A",
           "nextStep": [
-              {
-                  "msg": "condition 1",
+            {
+              "msg": "condition 1",
+              "nextStep": [
+                {
+                  "msg": "C",
                   "nextStep": [
-                      {
-                          "msg": "C",
-                          "nextStep": [
-                              {
-                                  "msg": "E",
-                                  "nextStep": [],
-                                  "index": 7,
-                                  "type": "DO"
-                              }
-                          ],
-                          "index": 2,
-                          "type": "DO"
-                      },
-                      {
-                          "msg": "condition 2",
-                          "nextStep": [
-                              {
-                                  "msg": "K",
-                                  "nextStep": [
-                                      {
-                                          "msg": "E",
-                                          "nextStep": [],
-                                          "index": 7,
-                                          "type": "DO"
-                                      }
-                                  ],
-                                  "index": 4,
-                                  "type": "DO"
-                              },
-                              {
-                                  "msg": "D",
-                                  "nextStep": [
-                                      {
-                                          "msg": "E",
-                                          "nextStep": [],
-                                          "index": 7,
-                                          "type": "DO"
-                                      }
-                                  ],
-                                  "index": 6,
-                                  "type": "DO"
-                              }
-                          ],
-                          "index": 3,
-                          "type": "ELSE_IF"
-                      }
+                    {
+                      "msg": "E",
+                      "nextStep": [],
+                      "index": 7,
+                      "type": "DO"
+                    }
                   ],
-                  "index": 1,
-                  "type": "IF"
-              }
+                  "index": 2,
+                  "type": "DO"
+                },
+                {
+                  "msg": "condition 2",
+                  "nextStep": [
+                    {
+                      "msg": "K",
+                      "nextStep": [
+                        "Point to step 7: DO E"
+                      ],
+                      "index": 4,
+                      "type": "DO"
+                    },
+                    {
+                      "msg": "D",
+                      "nextStep": [
+                        "Point to step 7: DO E"
+                      ],
+                      "index": 6,
+                      "type": "DO"
+                    }
+                  ],
+                  "index": 3,
+                  "type": "ELSE_IF"
+                }
+              ],
+              "index": 1,
+              "type": "IF"
+            }
           ],
           "index": 0,
           "type": "DO"
-      },
-      "exitStep": {
-          "msg": "E",
-          "nextStep": [],
-          "index": 7,
-          "type": "DO"
+        },
+        "exitStep": [
+          "Point to step 7: DO E"
+        ]
       }
-    }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
