@@ -56,8 +56,6 @@ describe("Flow Parser", function() {
     expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
   });
 
-  it("should parse flow with loop with multi exist", function() {
-  });
   it("should parse flow with loop with break", function() {
   });
   it("should parse flow with loop with continue", function() {
