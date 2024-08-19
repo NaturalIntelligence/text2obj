@@ -89,6 +89,7 @@ class FlowParser {
 
       const [stepType, stepMsg] = readStep(trimmedLine);
 
+      if(stepType === "END") break;
       // exchange pointers
       // using counter instead of line index so that
       //  - empty lines and multiple flows don't impact the index 
@@ -132,10 +133,6 @@ class FlowParser {
             // nestedExitSteps.push(nestedSteps.exitStep);
             nestedSteps.exitStep.nextStep.push(currentStep);
           }
-        }else if(stepType === "END"){
-          currentStep.nextStep = [];
-          // For validation purpose, we can just step a flag and throw error if next statement is found
-          break;
         }else if(stepType === "FOLLOW"){
           const flow = this.flows[stepMsg];
           if(!flow){
