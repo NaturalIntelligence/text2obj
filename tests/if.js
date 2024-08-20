@@ -160,8 +160,8 @@ describe("Flow Parser", function() {
     const flowText = `
         FLOW: Sample flow 1
         IF condition 1
-            IF condition 2
-                DO Yes
+          IF condition 2
+            DO Yes
         DO No
         `;
     const expected = {

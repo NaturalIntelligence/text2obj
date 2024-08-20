@@ -7,6 +7,7 @@ class FlowParser {
     this.lineIndex = 0;
     this.lines = [];
     this.counter = 0;
+    this.stepContext = [];
   }
 
   parse(flowText) {
@@ -89,29 +90,29 @@ class FlowParser {
 
       const [stepType, stepMsg] = readStep(trimmedLine);
 
-      if(stepType === "END") break;
-      else if(stepType === "SKIP") {
-        // point current node to loop back
-      }
+      if(stepType === "END") break;  // can be stored in this.currentFlow.exitSteps.push()
+      
       // exchange pointers
       // using counter instead of line index so that
       //  - empty lines and multiple flows don't impact the index 
       currentStep = new Step(stepType, stepMsg, this.counter);
       this.currentFlow.index[this.counter] = currentStep; //To support GOTO
       this.counter++;
+
       if(lastStep) {
-        if(stepType !== "ELSE") 
+        if(stepType !== "ELSE") // skip ELSE node from flow tree
           lastStep.nextStep.push(currentStep); // false branch
-      }
-      else entryStep = currentStep;
+      } else entryStep = currentStep;
 
       // process step
       if(stepType === "ELSE_IF"){
+        this.stepContext.push(currentStep);
         const nestedSteps = this.parseSteps(indentLevel);
         currentStep.nextStep.push(nestedSteps.entryStep);
         if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
       }else if(stepType === "ELSE"){
-        // skip unnecessary ELSE step 
+        // skip unnecessary ELSE step
+        this.stepContext.push(currentStep);
         const nestedSteps = this.parseSteps(indentLevel);
         lastStep.nextStep.push(nestedSteps.entryStep);
         if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
@@ -123,12 +124,19 @@ class FlowParser {
         });
         exitSteps = [];
 
-        if(stepType === "IF"){
+        if(stepType === "SKIP") { // point current node to loop back
+          // TODO: validate currentStep.nextStep === []
+          currentStep.nextStep.push(this.findParentStep("LOOP"));
+          // if(lastStep) currentStep = lastStep; // skip SKIP node from flow tree
+          continue;
+        }else if(stepType === "IF"){
+          this.stepContext.push(currentStep);
           const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
           if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
         }else if(stepType === "LOOP"){
           // LOOP is a IF step where last step points to IF back
+          this.stepContext.push(currentStep);
           const nestedSteps = this.parseSteps(indentLevel);
           currentStep.nextStep.push(nestedSteps.entryStep);
           if(nestedSteps.exitStep) {
@@ -138,6 +146,7 @@ class FlowParser {
             });
           }
         }else if(stepType === "FOLLOW"){
+          this.stepContext.push(currentStep);
           const flow = this.flows[stepMsg];
           if(!flow){
             //TODO: lazy loading
@@ -158,10 +167,19 @@ class FlowParser {
       }
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
-    exitSteps.push(currentStep)
+    this.stepContext.pop();
+    //SKIP step is already set to point parent loop
+    if(!currentStep || currentStep.type !== "SKIP") exitSteps.push(currentStep);
     return new Level( entryStep, exitSteps);
   }
 
+  findParentStep(stepType){
+    console.log(this.stepContext);
+    for(let i= this.stepContext.length - 1; i>-1; i--){
+      if(this.stepContext[i].type === stepType) return this.stepContext[i];
+    }
+    throw new Error(`No parent ${stepType} found`);
+  }
 }
 
 function isSupportedKeyword(){
