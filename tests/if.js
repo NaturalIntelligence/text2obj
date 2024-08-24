@@ -152,7 +152,74 @@ describe("Flow Parser", function() {
       }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
-    console.log(toSafeString(flows["Sample flow 1"]));
+    // console.log(toSafeString(flows["Sample flow 1"]));
+    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
+    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+  });
+  it("should parse flow with IF ELSE statement", function() {
+    const flowText = `
+        FLOW: Sample flow 1
+        IF 2 
+          IF 1
+            DO A
+          ELSE
+            DO B
+        `;
+    const expected = {
+      "name": "Sample flow 1",
+      "headers": {
+        "version": 1,
+        "threshold": 7000
+      },
+      "steps": {
+        "entryStep": {
+          "msg": "2",
+          "nextStep": [
+            {
+              "msg": "1",
+              "nextStep": [
+                {
+                  "msg": "A",
+                  "nextStep": [],
+                  "index": 2,
+                  "type": "DO"
+                },
+                {
+                  "msg": "B",
+                  "nextStep": [],
+                  "index": 4,
+                  "type": "DO"
+                }
+              ],
+              "index": 1,
+              "type": "IF"
+            }
+          ],
+          "index": 0,
+          "type": "IF"
+        },
+        "exitStep": [
+          "Point to step 2: DO A",
+          "Point to step 4: DO B",
+          "Point to step 0: IF 2"
+        ]
+      },
+      "index": {
+        "0": "Point to step 0: IF 2",
+        "1": "Point to step 1: IF 1",
+        "2": "Point to step 2: DO A",
+        "3": {
+          "nextStep": [],
+          "index": 3,
+          "type": "ELSE"
+        },
+        "4": "Point to step 4: DO B"
+      }
+    }
+    
+    const parser = new FlowParser();
+    const flows = parser.parse(flowText);
+    // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });

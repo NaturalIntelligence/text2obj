@@ -159,7 +159,7 @@ class FlowParser {
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
     //SKIP step is already set to point parent loop
-    if(!currentStep || currentStep.type !== "SKIP") exitSteps.push(currentStep);
+    if(!currentStep || (currentStep.type !== "SKIP" && currentStep.type !== "ELSE")) exitSteps.push(currentStep);
     return new Level( entryStep, exitSteps);
   }
 
