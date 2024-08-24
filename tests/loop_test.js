@@ -1,4 +1,4 @@
-const FlowParser = require("./../src/FlowParser"); 
+const FlowParser = require("../src/FlowParser"); 
 const {customDeepEqual, toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
