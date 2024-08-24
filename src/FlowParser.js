@@ -118,12 +118,13 @@ class FlowParser {
         // TODO: validate if the lastStep was IF or ELSE_IF
         const nestedSteps = this.processLevel(lastStep, indentLevel);
         if (nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
-      }else if(stepType === "SKIP") { // point current node to loop back
+      }else if(stepType === "SKIP") { // point current step to loop back
           // TODO: validate currentStep.nextStep === []
           // TODO: validate SKIP is not first step of FLOW or LOOP
 
-          if(lastStep) lastStep.nextStep.push(this.findParentStep("LOOP"));
-          else currentStep.nextStep.push(this.findParentStep("LOOP"));
+          const targetStep = this.findParentStep("LOOP");
+          if(lastStep) lastStep.nextStep.push(targetStep);
+          else currentStep.nextStep.push(targetStep);
 
           // validate no step after SKIP
           continue;
@@ -137,24 +138,6 @@ class FlowParser {
             if (step) step.nextStep.push(currentStep);
           });
         }
-      }else if(stepType === "FOLLOW"){
-        this.levelContext.push(currentStep);
-        const flow = this.flows[stepMsg];
-        if(!flow){
-          //TODO: lazy loading
-          throw Error("FLOW not found or not assigned yet: ", stepMsg);
-        }else{
-          //TODO
-          // should we point to the flow or steps of the flow?
-          // if pointing to the steps of the flow then
-          // drawing current flow would become difficult
-          const flowSteps = flow.steps;
-          currentStep.nextStep.push(nestedSteps.entryStep);
-          nestedSteps.exitStep = currentStep;
-          exitSteps.concat(nestedSteps.exitStep);
-        }
-      }else if(!isSupportedKeyword(stepType)){
-        throw Error(stepType, " is not supported");
       }
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
