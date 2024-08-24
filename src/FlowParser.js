@@ -7,7 +7,7 @@ class FlowParser {
     this.lineIndex = 0;
     this.lines = [];
     this.counter = 0;
-    this.stepContext = [];
+    this.levelContext = [];
   }
 
   parse(flowText) {
@@ -71,21 +71,16 @@ class FlowParser {
     
     this.lineIndex++;
     for (; this.lineIndex < this.lines.length;this.lineIndex++) {
-      
       const line = this.lines[this.lineIndex];
       const trimmedLine = line.trim();
       if (!trimmedLine) continue; // Skip empty lines
       
-      
       const indentLevel = line.search(/\S/); // Find first non-space character
       lastStep = currentStep;
-      if (trimmedLine.startsWith('FLOW:')) {
+      if (trimmedLine.startsWith('FLOW:') || indentLevel <= parentIndentation) {
         this.lineIndex--; // Roll back to reprocess this line in the outer loop
         break;
-      }else if(indentLevel <= parentIndentation){
-        this.lineIndex--;
-        break; //this level is done
-      } //else
+      } 
       console.log(trimmedLine);
 
       const [stepType, stepMsg] = readStep(trimmedLine);
@@ -100,83 +95,90 @@ class FlowParser {
       this.counter++;
 
       if(lastStep) {
-        if(stepType !== "ELSE") // skip ELSE node from flow tree
+        if(stepType !== "ELSE" && stepType !== "SKIP") // skip ELSE node from flow tree
           lastStep.nextStep.push(currentStep); // false branch
+
       } else entryStep = currentStep;
 
-      // process step
-      if(stepType === "ELSE_IF"){
-        this.stepContext.push(currentStep);
-        const nestedSteps = this.parseSteps(indentLevel);
-        currentStep.nextStep.push(nestedSteps.entryStep);
-        if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
-      }else if(stepType === "ELSE"){
-        // skip unnecessary ELSE step
-        this.stepContext.push(currentStep);
-        const nestedSteps = this.parseSteps(indentLevel);
-        lastStep.nextStep.push(nestedSteps.entryStep);
-        if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
-      }else{
-        //point all nestedLastSteps to current Step
+      //point all exitSteps to current Step
+      if(stepType !== "ELSE_IF" && stepType !== "ELSE"){
         exitSteps.forEach(step => {
-          //to exclude END steps
+          //END step sets as null so need  to exclude them
           if(step) step.nextStep.push(currentStep);
         });
         exitSteps = [];
+      }
 
-        if(stepType === "SKIP") { // point current node to loop back
+      // process step
+      if(stepType === "ELSE_IF"|| stepType === "IF" ){
+        // TODO: validate if the lastStep was IF or ELSE_IF
+        const nestedSteps = this.processLevel(currentStep, indentLevel);
+        if (nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
+      }else if(stepType === "ELSE"){
+        // TODO: validate if the lastStep was IF or ELSE_IF
+        const nestedSteps = this.processLevel(lastStep, indentLevel);
+        if (nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
+      }else if(stepType === "SKIP") { // point current node to loop back
           // TODO: validate currentStep.nextStep === []
-          currentStep.nextStep.push(this.findParentStep("LOOP"));
-          // if(lastStep) currentStep = lastStep; // skip SKIP node from flow tree
+          // TODO: validate SKIP is not first step of FLOW or LOOP
+
+          if(lastStep) lastStep.nextStep.push(this.findParentStep("LOOP"));
+          else currentStep.nextStep.push(this.findParentStep("LOOP"));
+
+          // validate no step after SKIP
           continue;
-        }else if(stepType === "IF"){
-          this.stepContext.push(currentStep);
-          const nestedSteps = this.parseSteps(indentLevel);
-          currentStep.nextStep.push(nestedSteps.entryStep);
-          if(nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
-        }else if(stepType === "LOOP"){
-          // LOOP is a IF step where last step points to IF back
-          this.stepContext.push(currentStep);
-          const nestedSteps = this.parseSteps(indentLevel);
-          currentStep.nextStep.push(nestedSteps.entryStep);
-          if(nestedSteps.exitStep) {
-            nestedSteps.exitStep.forEach(step => {
-              //to exclude END steps
-              if(step) step.nextStep.push(currentStep);
-            });
-          }
-        }else if(stepType === "FOLLOW"){
-          this.stepContext.push(currentStep);
-          const flow = this.flows[stepMsg];
-          if(!flow){
-            //TODO: lazy loading
-            throw Error("FLOW not found or not assigned yet: ", stepMsg);
-          }else{
-            //TODO
-            // should we point to the flow or steps of the flow?
-            // if pointing to the steps of the flow then
-            // drawing current flow would become difficult
-            const flowSteps = flow.steps;
-            currentStep.nextStep.push(nestedSteps.entryStep);
-            nestedSteps.exitStep = currentStep;
-            exitSteps.concat(nestedSteps.exitStep);
-          }
-        }else if(!isSupportedKeyword(stepType)){
-          throw Error(stepType, " is not supported");
+      }else if(stepType === "LOOP"){
+        const nestedSteps = this.processLevel(currentStep, indentLevel);
+
+        // exit step points to starting step
+        if (nestedSteps.exitStep) {
+          nestedSteps.exitStep.forEach(step => {
+            // sometimes a step points to END. Hence, null.
+            if (step) step.nextStep.push(currentStep);
+          });
         }
+      }else if(stepType === "FOLLOW"){
+        this.levelContext.push(currentStep);
+        const flow = this.flows[stepMsg];
+        if(!flow){
+          //TODO: lazy loading
+          throw Error("FLOW not found or not assigned yet: ", stepMsg);
+        }else{
+          //TODO
+          // should we point to the flow or steps of the flow?
+          // if pointing to the steps of the flow then
+          // drawing current flow would become difficult
+          const flowSteps = flow.steps;
+          currentStep.nextStep.push(nestedSteps.entryStep);
+          nestedSteps.exitStep = currentStep;
+          exitSteps.concat(nestedSteps.exitStep);
+        }
+      }else if(!isSupportedKeyword(stepType)){
+        throw Error(stepType, " is not supported");
       }
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
-    this.stepContext.pop();
     //SKIP step is already set to point parent loop
     if(!currentStep || currentStep.type !== "SKIP") exitSteps.push(currentStep);
     return new Level( entryStep, exitSteps);
   }
 
+  processLevel(currentStep, indentLevel) {
+    this.levelContext.push(currentStep); //TODO: setting wrong for ELSE level
+    const nestedSteps = this.parseSteps(indentLevel);
+    if(nestedSteps.entryStep && nestedSteps.entryStep.type === "SKIP"){
+      currentStep.nextStep.push(nestedSteps.entryStep.nextStep[0]);  
+    }else{
+      currentStep.nextStep.push(nestedSteps.entryStep);
+    }
+    this.levelContext.pop();
+    return nestedSteps;
+  }
+
   findParentStep(stepType){
-    console.log(this.stepContext);
-    for(let i= this.stepContext.length - 1; i>-1; i--){
-      if(this.stepContext[i].type === stepType) return this.stepContext[i];
+    console.log(this.levelContext);
+    for(let i= this.levelContext.length - 1; i>-1; i--){
+      if(this.levelContext[i].type === stepType) return this.levelContext[i];
     }
     throw new Error(`No parent ${stepType} found`);
   }
