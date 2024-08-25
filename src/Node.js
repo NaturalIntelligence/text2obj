@@ -7,9 +7,12 @@ class Step {
     this.type = type;
   }
 
-  addNextNode(node) {
-    this.nextNodes.push(node);
+  point(node) {
+    this.nextStep.push(node);
   }
+
+  trueSide(){ return this.nextStep[0]}
+  falseSide(){ return this.nextStep[1]}
 }
 
 class Level {

@@ -96,7 +96,7 @@ class FlowParser {
 
       if(lastStep) {
         if(stepType !== "ELSE" && stepType !== "SKIP") // skip ELSE node from flow tree
-          lastStep.nextStep.push(currentStep); // false branch
+          lastStep.point(currentStep); // false branch
 
       } else entryStep = currentStep;
 
@@ -104,7 +104,7 @@ class FlowParser {
       if(stepType !== "ELSE_IF" && stepType !== "ELSE"){
         exitSteps.forEach(step => {
           //END step sets as null so need  to exclude them
-          if(step) step.nextStep.push(currentStep);
+          if(step) step.point(currentStep);
         });
         exitSteps = [];
       }
@@ -123,8 +123,8 @@ class FlowParser {
           // TODO: validate SKIP is not first step of FLOW or LOOP
 
           const targetStep = this.findParentStep("LOOP");
-          if(lastStep) lastStep.nextStep.push(targetStep);
-          else currentStep.nextStep.push(targetStep);
+          if(lastStep) lastStep.point(targetStep);
+          else currentStep.point(targetStep);
 
           // validate no step after SKIP
           continue;
@@ -135,7 +135,7 @@ class FlowParser {
         if (nestedSteps.exitStep) {
           nestedSteps.exitStep.forEach(step => {
             // sometimes a step points to END. Hence, null.
-            if (step) step.nextStep.push(currentStep);
+            if (step) step.point(currentStep);
           });
         }
       }
@@ -148,14 +148,14 @@ class FlowParser {
 
   processLevel(currentStep, indentLevel) {
     this.levelContext.push(currentStep); //TODO: setting wrong for ELSE level
-    const nestedSteps = this.parseSteps(indentLevel);
-    if(nestedSteps.entryStep && nestedSteps.entryStep.type === "SKIP"){
-      currentStep.nextStep.push(nestedSteps.entryStep.nextStep[0]);  
+    const childLevel = this.parseSteps(indentLevel);
+    if(childLevel.entryStep && childLevel.entryStep.type === "SKIP"){
+      currentStep.point(childLevel.entryStep.nextStep[0]);  
     }else{
-      currentStep.nextStep.push(nestedSteps.entryStep);
+      currentStep.point(childLevel.entryStep);
     }
     this.levelContext.pop();
-    return nestedSteps;
+    return childLevel;
   }
 
   findParentStep(stepType){
