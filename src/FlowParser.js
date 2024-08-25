@@ -87,12 +87,7 @@ class FlowParser {
 
       if(stepType === "END") break;  // can be stored in this.currentFlow.exitSteps.push()
       
-      // exchange pointers
-      // using counter instead of line index so that
-      //  - empty lines and multiple flows don't impact the index 
-      currentStep = new Step(stepType, stepMsg, this.counter);
-      this.currentFlow.index[this.counter] = currentStep; //To support GOTO
-      this.counter++;
+      currentStep = this.createStep(currentStep, stepType, stepMsg);
 
       if(lastStep) {
         if(stepType !== "ELSE" && stepType !== "SKIP") // skip ELSE node from flow tree
@@ -144,6 +139,15 @@ class FlowParser {
     //SKIP step is already set to point parent loop
     if(!currentStep || (currentStep.type !== "SKIP" && currentStep.type !== "ELSE")) exitSteps.push(currentStep);
     return new Level( entryStep, exitSteps);
+  }
+
+  createStep(currentStep, stepType, stepMsg) {
+    // using counter instead of line index so that
+      //  - empty lines and multiple flows don't impact the index 
+    currentStep = new Step(stepType, stepMsg, this.counter);
+    this.currentFlow.index[this.counter] = currentStep; //To support GOTO
+    this.counter++;
+    return currentStep;
   }
 
   processLevel(currentStep, indentLevel) {
