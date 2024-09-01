@@ -115,24 +115,17 @@ class FlowParser {
       if(stepType === "ELSE_IF"|| stepType === "IF" ){
         // TODO: validate if the lastStep was IF or ELSE_IF
         const lvlExitSteps = this.processLevel(currentStep, indentLevel);
-        if(lvlExitSteps) exitSteps = exitSteps.concat(lvlExitSteps);
+        exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
       }else if(stepType === "ELSE"){
         // TODO: validate if the lastStep was IF or ELSE_IF
         const lvlExitSteps = this.processLevel(lastStep, indentLevel);
-        if (lvlExitSteps) exitSteps = exitSteps.concat(lvlExitSteps);
+        exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
+      }else if(stepType === "LOOP"){
+        const lvlExitSteps = this.processLevel(currentStep, indentLevel);
+        exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
       }else if(stepType === "SKIP") { // point current step to loop back
         this.handleSkip(parentStep, lastStep);
         continue;
-      }else if(stepType === "LOOP"){
-        const lvlExitSteps = this.processLevel(currentStep, indentLevel);
-
-        // exit step points to starting step
-        if (lvlExitSteps) {
-          lvlExitSteps.forEach(step => {
-            // sometimes a step points to END. Hence, null.
-            if (step) step.point(currentStep);
-          });
-        }
       }
       endStep = currentStep
     }//End Loop
@@ -141,6 +134,26 @@ class FlowParser {
     return exitSteps;
   }
 
+  /**
+   * Handle exit steps of nested level of current step
+   * @param {Step[]} lvlExitSteps 
+   * @param {Step} lvlStep 
+   * @param {Step[]} exitSteps 
+   * @returns 
+   */
+  handleExitSteps(lvlExitSteps,lvlStep, exitSteps){
+    if (lvlExitSteps){
+      if(lvlStep.type === "LOOP"){// exit step points to starting step
+        lvlExitSteps.forEach(step => {
+          // sometimes a step points to END. Hence, null.
+          if (step) step.point(lvlStep);
+        });
+        return  exitSteps;
+      }else{ // For IF,  ELSE_IF, ELSE: cumulate exit steps to point next step
+        return exitSteps.concat(lvlExitSteps);
+      }
+    }
+  }
   handleSkip(parentStep, lastStep) {
     // TODO: validate currentStep.nextStep === []
     // TODO: validate SKIP is not first step of FLOW or LOOP
