@@ -95,19 +95,16 @@ class FlowParser {
       }else {
         if (isFirstStep(parentStep))
           parentStep.point(currentStep);
-        else if (currentStep.type !== "ELSE") // skip ELSE node from flow tree
+        else if (currentStep.isNot("ELSE")) // skip ELSE node from flow tree
           lastStep.point(currentStep);
         
-        if(currentStep.type === "ELSE_IF"|| currentStep.type === "IF" ){
+        if(currentStep.is("ELSE_IF", "IF", "LOOP")){
           // TODO: validate if the lastStep was IF or ELSE_IF
           const lvlExitSteps = this.processLevel(currentStep, indentLevel);
           exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
-        }else if(currentStep.type === "ELSE"){
+        }else if(currentStep.is("ELSE")){
           // TODO: validate if the lastStep was IF or ELSE_IF
           const lvlExitSteps = this.processLevel(lastStep, indentLevel);
-          exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
-        }else if(currentStep.type === "LOOP"){
-          const lvlExitSteps = this.processLevel(currentStep, indentLevel);
           exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
         }
       }
@@ -197,7 +194,7 @@ class FlowParser {
       this.currentFlow.exitSteps.push(lastStep);
     }
   }
-  
+
   pointLeavingStepTo(parentStep, lastStep, targetStep){
     // TODO: validate it is not first step of FLOW or LOOP
     if (isFirstStep(parentStep)) parentStep.point(targetStep);

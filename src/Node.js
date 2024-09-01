@@ -11,6 +11,12 @@ class Step {
     this.nextStep.push(node);
   }
 
+  is(...type){
+    return type.indexOf(this.type) !== -1
+  }
+  isNot(...type){
+    return type.indexOf(this.type) === -1
+  }
   trueSide(){ return this.nextStep[0]}
   falseSide(){ return this.nextStep[1]}
 }
