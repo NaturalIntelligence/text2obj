@@ -121,15 +121,8 @@ class FlowParser {
         const lvlExitSteps = this.processLevel(lastStep, indentLevel);
         if (lvlExitSteps) exitSteps = exitSteps.concat(lvlExitSteps);
       }else if(stepType === "SKIP") { // point current step to loop back
-          // TODO: validate currentStep.nextStep === []
-          // TODO: validate SKIP is not first step of FLOW or LOOP
-
-          const targetStep = this.findParentStep("LOOP");
-          if(isFirstStep(parentStep))parentStep.point(targetStep) ;
-          else lastStep.point(targetStep);
-
-          // validate no step after SKIP
-          continue;
+        this.handleSkip(parentStep, lastStep);
+        continue;
       }else if(stepType === "LOOP"){
         const lvlExitSteps = this.processLevel(currentStep, indentLevel);
 
@@ -144,16 +137,24 @@ class FlowParser {
       endStep = currentStep
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
-    if(!endStep || (currentStep.type !== "END" && currentStep.type !== "SKIP" && currentStep.type !== "ELSE")) exitSteps.push(endStep);
+    if(!endStep || (!isLeavingStep(currentStep.type) && currentStep.type !== "ELSE")) exitSteps.push(endStep);
     return exitSteps;
   }
 
+  handleSkip(parentStep, lastStep) {
+    // TODO: validate currentStep.nextStep === []
+    // TODO: validate SKIP is not first step of FLOW or LOOP
+    const targetStep = this.findParentStep("LOOP");
+    if (isFirstStep(parentStep)) parentStep.point(targetStep);
+    else lastStep.point(targetStep);
+
+    // validate no step after SKIP
+  }
+
   createStep(stepType, stepMsg) {
-    // using counter instead of line index so that
-      //  - empty lines and multiple flows don't impact the index 
     const step = new Step(stepType, stepMsg, this.counter);
-    if(leavingSteps.indexOf(stepType) === -1)
-      this.currentFlow.index[this.counter] = step; //To support GOTO
+    if(!isLeavingStep(stepType))
+      this.currentFlow.index[this.counter] = step;
     this.counter++;
     return step;
   }
@@ -175,6 +176,9 @@ class FlowParser {
 }
 function isFirstStep(step){
   return step.nextStep.length === 0;
+}
+function isLeavingStep(stepType){
+  return leavingSteps.indexOf(stepType) !== -1;
 }
 function isSupportedKeyword(){
   return true;
