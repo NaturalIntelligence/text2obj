@@ -98,13 +98,16 @@ class FlowParser {
         else if (currentStep.isNot("ELSE")) // skip ELSE node from flow tree
           lastStep.point(currentStep);
         
-        if(currentStep.is("ELSE_IF", "IF", "LOOP")){
-          // TODO: validate if the lastStep was IF or ELSE_IF
-          const lvlExitSteps = this.processLevel(currentStep, indentLevel);
-          exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
-        }else if(currentStep.is("ELSE")){
-          // TODO: validate if the lastStep was IF or ELSE_IF
-          const lvlExitSteps = this.processLevel(lastStep, indentLevel);
+        if(isBranchStep(currentStep.type)){
+          let step = null;
+          if(currentStep.is("ELSE_IF", "IF", "LOOP")){
+            // TODO: validate if the lastStep was IF or ELSE_IF
+            step = currentStep;
+          }else if(currentStep.is("ELSE")){
+            // TODO: validate if the lastStep was IF or ELSE_IF
+            step = lastStep;
+          }
+          const lvlExitSteps = this.processLevel(step, indentLevel);
           exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
         }
       }
