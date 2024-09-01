@@ -1,5 +1,6 @@
 const {Step,Flow} = require("./Node");
 const leavingSteps = ["SKIP","END","GOTO","STOP"];
+const branchSteps = ["IF","ELSE","ELSE_IF","LOOP"];
 
 class FlowParser {
   constructor() {
@@ -64,7 +65,7 @@ class FlowParser {
   }
 
   parseSteps(parentStep, parentIndentation) {
-    console.log("reading indentation: ", parentIndentation);
+    // console.log("reading indentation: ", parentIndentation);
 
     let exitSteps = []; // to point next step in upper level
     let lastStep = null;      // to point next step in current level, to set  exitStep
@@ -85,52 +86,54 @@ class FlowParser {
       } 
       console.log(trimmedLine);
 
-      const [stepType, stepMsg] = readStep(trimmedLine);
+      currentStep = this.createStep(trimmedLine);
+      exitSteps = this.pointExitSteps(exitSteps, currentStep);
 
-      currentStep = this.createStep(stepType, stepMsg);
-      if(stepType === "END") {
-        lastStep.point(null);
-        this.currentFlow.exitSteps.push(lastStep);
-        break;  // can be stored in this.currentFlow.exitSteps.push()
-      }
-      
-      // if(!endStep) parentStep.point(currentStep);
-      if(stepType !== "SKIP"){
-        if(isFirstStep(parentStep)) 
+      if(isLeavingStep(currentStep.type)){
+        this.updateForLeavingStep(parentStep, lastStep, currentStep);
+        break;
+      }else {
+        if (isFirstStep(parentStep))
           parentStep.point(currentStep);
-        else if(stepType !== "ELSE" && stepType !== "SKIP") // skip ELSE node from flow tree
-          lastStep.point(currentStep); // false branch
-      }
-
-      //point all exitSteps to current Step
-      if(stepType !== "ELSE_IF" && stepType !== "ELSE"){
-        exitSteps.forEach(step => {
-          //END step sets as null so need  to exclude them
-          if(step) step.point(currentStep);
-        });
-        exitSteps = [];
-      }
-
-      // process step
-      if(stepType === "ELSE_IF"|| stepType === "IF" ){
-        // TODO: validate if the lastStep was IF or ELSE_IF
-        const lvlExitSteps = this.processLevel(currentStep, indentLevel);
-        exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
-      }else if(stepType === "ELSE"){
-        // TODO: validate if the lastStep was IF or ELSE_IF
-        const lvlExitSteps = this.processLevel(lastStep, indentLevel);
-        exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
-      }else if(stepType === "LOOP"){
-        const lvlExitSteps = this.processLevel(currentStep, indentLevel);
-        exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
-      }else if(stepType === "SKIP") { // point current step to loop back
-        this.handleSkip(parentStep, lastStep);
-        continue;
+        else if (currentStep.type !== "ELSE") // skip ELSE node from flow tree
+          lastStep.point(currentStep);
+        
+        if(currentStep.type === "ELSE_IF"|| currentStep.type === "IF" ){
+          // TODO: validate if the lastStep was IF or ELSE_IF
+          const lvlExitSteps = this.processLevel(currentStep, indentLevel);
+          exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
+        }else if(currentStep.type === "ELSE"){
+          // TODO: validate if the lastStep was IF or ELSE_IF
+          const lvlExitSteps = this.processLevel(lastStep, indentLevel);
+          exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
+        }else if(currentStep.type === "LOOP"){
+          const lvlExitSteps = this.processLevel(currentStep, indentLevel);
+          exitSteps = this.handleExitSteps(lvlExitSteps,currentStep,exitSteps);
+        }
       }
       endStep = currentStep
     }//End Loop
-    console.log("leaving indentation ", parentIndentation)
+    // console.log("leaving indentation ", parentIndentation)
     if(!endStep || (!isLeavingStep(currentStep.type) && currentStep.type !== "ELSE")) exitSteps.push(endStep);
+    return exitSteps;
+  }
+
+  /**
+   * point Cumulated Exit Steps of last step level To Current Step
+   * @param {string} stepType 
+   * @param {Step[]} exitSteps 
+   * @param {Step} currentStep 
+   * @returns 
+   */
+  pointExitSteps(exitSteps, currentStep) {
+    if (currentStep.type !== "ELSE_IF" && currentStep.type !== "ELSE") {
+      //point all exitSteps to current Step
+      exitSteps.forEach(step => {
+        //END step sets as null so need  to exclude them
+        if (step) step.point(currentStep);
+      });
+      exitSteps = [];
+    }
     return exitSteps;
   }
 
@@ -154,17 +157,10 @@ class FlowParser {
       }
     }
   }
-  handleSkip(parentStep, lastStep) {
-    // TODO: validate currentStep.nextStep === []
-    // TODO: validate SKIP is not first step of FLOW or LOOP
-    const targetStep = this.findParentStep("LOOP");
-    if (isFirstStep(parentStep)) parentStep.point(targetStep);
-    else lastStep.point(targetStep);
 
-    // validate no step after SKIP
-  }
 
-  createStep(stepType, stepMsg) {
+  createStep(trimmedLine) {
+    const [stepType, stepMsg] = readStep(trimmedLine);
     const step = new Step(stepType, stepMsg, this.counter);
     if(!isLeavingStep(stepType))
       this.currentFlow.index[this.counter] = step;
@@ -186,12 +182,39 @@ class FlowParser {
     }
     throw new Error(`No parent ${stepType} found`);
   }
+
+  /**
+   * Update last step to skip current step
+   * @param {Step} parentStep 
+   * @param {Step} lastStep 
+   * @param {Step} currentStep 
+   */
+  updateForLeavingStep(parentStep, lastStep, currentStep){
+    if(currentStep.type === "SKIP") { // point current step to loop back
+      this.pointLeavingStepTo(parentStep, lastStep, this.findParentStep("LOOP"));
+    }else if(currentStep.type === "END") { // point current step to null
+      this.pointLeavingStepTo(parentStep, lastStep, null);
+      this.currentFlow.exitSteps.push(lastStep);
+    }
+  }
+  
+  pointLeavingStepTo(parentStep, lastStep, targetStep){
+    // TODO: validate it is not first step of FLOW or LOOP
+    if (isFirstStep(parentStep)) parentStep.point(targetStep);
+    else lastStep.point(targetStep);
+    // TODO: validate no step after SKIP
+  }
 }
+
+
 function isFirstStep(step){
   return step.nextStep.length === 0;
 }
 function isLeavingStep(stepType){
   return leavingSteps.indexOf(stepType) !== -1;
+}
+function isBranchStep(stepType){
+  return branchSteps.indexOf(stepType) !== -1;
 }
 function isSupportedKeyword(){
   return true;
