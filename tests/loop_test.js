@@ -14,50 +14,64 @@ describe("Flow Parser", function() {
         DO last`;
 
     const expected = {
-      "entryStep": {
-        "msg": "condition 1",
-        "nextStep": [
-          {
-            "msg": "this",
-            "nextStep": [
-              {
-                "msg": "condition 2",
-                "nextStep": [
-                  {
-                    "msg": "that",
-                    "nextStep": [
-                      "Point to step 0: LOOP condition 1"
-                    ],
-                    "index": 3,
-                    "type": "DO"
-                  },
-                  "Point to step 0: LOOP condition 1"
-                ],
-                "index": 2,
-                "type": "IF"
-              }
-            ],
-            "index": 1,
-            "type": "Do"
-          },
-          {
-            "msg": "last",
-            "nextStep": [],
-            "index": 4,
-            "type": "DO"
-          }
-        ],
-        "index": 0,
-        "type": "LOOP"
+      "name": "Sample flow 1",
+      "headers": {
+        "version": 1,
+        "threshold": 5000
       },
-      "exitStep": [
+      "steps": [
+        {
+          "msg": "condition 1",
+          "nextStep": [
+            {
+              "msg": "this",
+              "nextStep": [
+                {
+                  "msg": "condition 2",
+                  "nextStep": [
+                    {
+                      "msg": "that",
+                      "nextStep": [
+                        "Point to step 0: LOOP condition 1"
+                      ],
+                      "index": 3,
+                      "type": "DO"
+                    },
+                    "Point to step 0: LOOP condition 1"
+                  ],
+                  "index": 2,
+                  "type": "IF"
+                }
+              ],
+              "index": 1,
+              "type": "Do"
+            },
+            {
+              "msg": "last",
+              "nextStep": [],
+              "index": 4,
+              "type": "DO"
+            }
+          ],
+          "index": 0,
+          "type": "LOOP"
+        }
+      ],
+      "index": {
+        "0": "Point to step 0: LOOP condition 1",
+        "1": "Point to step 1: Do this",
+        "2": "Point to step 2: IF condition 2",
+        "3": "Point to step 3: DO that",
+        "4": "Point to step 4: DO last"
+      },
+      "exitSteps": [
         "Point to step 4: DO last"
       ]
-    };
+    }
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
   it("should parse flow with loop and nested IF condition", function() {
     const flowText = `
@@ -72,58 +86,74 @@ describe("Flow Parser", function() {
         DO C`;
 
     const expected = {
-      "entryStep": {
-        "msg": "condition 1",
-        "nextStep": [
-          {
-            "msg": "A",
-            "nextStep": [
-              {
-                "msg": "condition 2",
-                "nextStep": [
-                  {
-                    "msg": "condition 3",
-                    "nextStep": [
-                      {
-                        "msg": "B",
-                        "nextStep": [
-                          "Point to step 0: LOOP condition 1"
-                        ],
-                        "index": 4,
-                        "type": "DO"
-                      },
-                      "Point to step 0: LOOP condition 1"
-                    ],
-                    "index": 3,
-                    "type": "IF"
-                  },
-                  "Point to step 0: LOOP condition 1"
-                ],
-                "index": 2,
-                "type": "IF"
-              }
-            ],
-            "index": 1,
-            "type": "Do"
-          },
-          {
-            "msg": "C",
-            "nextStep": [],
-            "index": 5,
-            "type": "DO"
-          }
-        ],
-        "index": 0,
-        "type": "LOOP"
+      "name": "Sample flow 1",
+      "headers": {
+        "version": 1,
+        "threshold": 5000
       },
-      "exitStep": [
+      "steps": [
+        {
+          "msg": "condition 1",
+          "nextStep": [
+            {
+              "msg": "A",
+              "nextStep": [
+                {
+                  "msg": "condition 2",
+                  "nextStep": [
+                    {
+                      "msg": "condition 3",
+                      "nextStep": [
+                        {
+                          "msg": "B",
+                          "nextStep": [
+                            "Point to step 0: LOOP condition 1"
+                          ],
+                          "index": 4,
+                          "type": "DO"
+                        },
+                        "Point to step 0: LOOP condition 1"
+                      ],
+                      "index": 3,
+                      "type": "IF"
+                    },
+                    "Point to step 0: LOOP condition 1"
+                  ],
+                  "index": 2,
+                  "type": "IF"
+                }
+              ],
+              "index": 1,
+              "type": "Do"
+            },
+            {
+              "msg": "C",
+              "nextStep": [],
+              "index": 5,
+              "type": "DO"
+            }
+          ],
+          "index": 0,
+          "type": "LOOP"
+        }
+      ],
+      "index": {
+        "0": "Point to step 0: LOOP condition 1",
+        "1": "Point to step 1: Do A",
+        "2": "Point to step 2: IF condition 2",
+        "3": "Point to step 3: IF condition 3",
+        "4": "Point to step 4: DO B",
+        "5": "Point to step 5: DO C"
+      },
+      "exitSteps": [
         "Point to step 5: DO C"
       ]
-    };
+    }
+    ;
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
 
   it("should parse flow with loop with SKIP", function() {
@@ -144,8 +174,8 @@ describe("Flow Parser", function() {
         "version": 1,
         "threshold": 5000
       },
-      "steps": {
-        "entryStep": {
+      "steps": [
+        {
           "msg": "condition 1",
           "nextStep": [
             {
@@ -180,25 +210,18 @@ describe("Flow Parser", function() {
           ],
           "index": 0,
           "type": "LOOP"
-        },
-        "exitStep": [
-          "Point to step 5: DO C"
-        ]
-      },
+        }
+      ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
         "1": "Point to step 1: Do A",
         "2": "Point to step 2: IF condition 2",
-        "3": {
-          "nextStep": [
-            "Point to step 0: LOOP condition 1"
-          ],
-          "index": 3,
-          "type": "SKIP"
-        },
         "4": "Point to step 4: DO B",
         "5": "Point to step 5: DO C"
-      }
+      },
+      "exitSteps": [
+        "Point to step 5: DO C"
+      ]
     };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
@@ -225,8 +248,8 @@ describe("Flow Parser", function() {
         "version": 1,
         "threshold": 5000
       },
-      "steps": {
-        "entryStep": {
+      "steps": [
+        {
           "msg": "condition 1",
           "nextStep": [
             {
@@ -268,11 +291,8 @@ describe("Flow Parser", function() {
           ],
           "index": 0,
           "type": "LOOP"
-        },
-        "exitStep": [
-          "Point to step 7: DO C"
-        ]
-      },
+        }
+      ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
         "1": "Point to step 1: Do A",
@@ -285,16 +305,12 @@ describe("Flow Parser", function() {
           "index": 4,
           "type": "ELSE"
         },
-        "5": {
-          "nextStep": [
-            "Point to step 0: LOOP condition 1"
-          ],
-          "index": 5,
-          "type": "SKIP"
-        },
         "6": "Point to step 6: DO B",
         "7": "Point to step 7: DO C"
-      }
+      },
+      "exitSteps": [
+        "Point to step 7: DO C"
+      ]
     };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
@@ -320,8 +336,8 @@ describe("Flow Parser", function() {
         "version": 1,
         "threshold": 5000
       },
-      "steps": {
-        "entryStep": {
+      "steps": [
+        {
           "msg": "condition 1",
           "nextStep": [
             {
@@ -363,26 +379,20 @@ describe("Flow Parser", function() {
           ],
           "index": 0,
           "type": "LOOP"
-        },
-        "exitStep": [
-          "Point to step 6: DO C"
-        ]
-      },
+        }
+      ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
         "1": "Point to step 1: Do A",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: DO K",
-        "4": {
-          "nextStep": [],
-          "index": 4,
-          "type": "SKIP"
-        },
         "5": "Point to step 5: DO B",
         "6": "Point to step 6: DO C"
-      }
-    }
-    ;
+      },
+      "exitSteps": [
+        "Point to step 6: DO C"
+      ]
+    };
     const parser = new FlowParser();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));

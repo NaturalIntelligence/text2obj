@@ -30,7 +30,8 @@ class Flow {
       threshold: 7000 // ms
     };
     this.steps = null; // Should point to start Node
-    this.index = {}
+    this.index = {};
+    this.exitSteps = [];
   }
 }
 
