@@ -15,13 +15,6 @@ class Step {
   falseSide(){ return this.nextStep[1]}
 }
 
-class Level {
-  constructor(entryStep, exitStep) {
-    this.entryStep = entryStep;
-    this.exitStep = exitStep;
-  }
-}
-
 class Flow {
   constructor(name) {
     this.name = name;
@@ -37,7 +30,6 @@ class Flow {
 
 module.exports = {
   Step: Step,
-  Level: Level,
   Flow: Flow
 }
 // Example usage

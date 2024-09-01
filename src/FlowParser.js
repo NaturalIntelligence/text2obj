@@ -1,4 +1,4 @@
-const {Step,Level,Flow} = require("./Node");
+const {Step,Flow} = require("./Node");
 const leavingSteps = ["SKIP","END","GOTO","STOP"];
 
 class FlowParser {
@@ -36,7 +36,7 @@ class FlowParser {
         this.lineIndex++; // Move to next line to process headers and statements
         this.parseHeaders(); // Parse headers
         const root = new Step("!", "!", -1);
-        this.currentFlow.exitSteps = this.currentFlow.exitSteps.concat(this.parseSteps(root, -1).exitStep); // Start parsing with initial indent level
+        this.currentFlow.exitSteps = this.currentFlow.exitSteps.concat(this.parseSteps(root, -1)); // Start parsing with initial indent level
         this.currentFlow.steps = root.nextStep;
       }
     }
@@ -114,12 +114,12 @@ class FlowParser {
       // process step
       if(stepType === "ELSE_IF"|| stepType === "IF" ){
         // TODO: validate if the lastStep was IF or ELSE_IF
-        const nestedSteps = this.processLevel(currentStep, indentLevel);
-        if (nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
+        const lvlExitSteps = this.processLevel(currentStep, indentLevel);
+        if(lvlExitSteps) exitSteps = exitSteps.concat(lvlExitSteps);
       }else if(stepType === "ELSE"){
         // TODO: validate if the lastStep was IF or ELSE_IF
-        const nestedSteps = this.processLevel(lastStep, indentLevel);
-        if (nestedSteps.exitStep) exitSteps = exitSteps.concat(nestedSteps.exitStep);
+        const lvlExitSteps = this.processLevel(lastStep, indentLevel);
+        if (lvlExitSteps) exitSteps = exitSteps.concat(lvlExitSteps);
       }else if(stepType === "SKIP") { // point current step to loop back
           // TODO: validate currentStep.nextStep === []
           // TODO: validate SKIP is not first step of FLOW or LOOP
@@ -131,11 +131,11 @@ class FlowParser {
           // validate no step after SKIP
           continue;
       }else if(stepType === "LOOP"){
-        const nestedSteps = this.processLevel(currentStep, indentLevel);
+        const lvlExitSteps = this.processLevel(currentStep, indentLevel);
 
         // exit step points to starting step
-        if (nestedSteps.exitStep) {
-          nestedSteps.exitStep.forEach(step => {
+        if (lvlExitSteps) {
+          lvlExitSteps.forEach(step => {
             // sometimes a step points to END. Hence, null.
             if (step) step.point(currentStep);
           });
@@ -145,7 +145,7 @@ class FlowParser {
     }//End Loop
     console.log("leaving indentation ", parentIndentation)
     if(!endStep || (currentStep.type !== "END" && currentStep.type !== "SKIP" && currentStep.type !== "ELSE")) exitSteps.push(endStep);
-    return new Level( null, exitSteps);
+    return exitSteps;
   }
 
   createStep(stepType, stepMsg) {
@@ -160,9 +160,9 @@ class FlowParser {
 
   processLevel(currentStep, indentLevel) {
     this.levelContext.push(currentStep); //TODO: setting wrong for ELSE level
-    const childLevel = this.parseSteps(currentStep, indentLevel);
+    const exitSteps = this.parseSteps(currentStep, indentLevel);
     this.levelContext.pop();
-    return childLevel;
+    return exitSteps;
   }
 
   findParentStep(stepType){
