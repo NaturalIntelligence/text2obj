@@ -171,20 +171,33 @@ class FlowParser {
   }
 
   processLevel(currentStep, indentLevel) {
-    this.levelContext.push(currentStep); //TODO: setting wrong for ELSE level
+    this.levelContext.push({step:currentStep,indent:indentLevel}); //TODO: setting wrong for ELSE level
     const exitSteps = this.parseSteps(currentStep, indentLevel);
     this.levelContext.pop();
     return exitSteps;
   }
 
   findParentStep(stepType){
-    console.log(this.levelContext);
+    // console.log(this.levelContext);
     for(let i= this.levelContext.length - 1; i>-1; i--){
-      if(this.levelContext[i].type === stepType) return this.levelContext[i];
+      if(this.levelContext[i].step.type === stepType) return this.levelContext[i];
     }
     throw new Error(`No parent ${stepType} found`);
   }
 
+  findNextStepIndexOnIndent(indent){
+    let i = this.lineIndex; 
+    for (; i < this.lines.length;i++) {
+      const line = this.lines[i];
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue; // Skip empty lines
+      
+      const indentLevel = line.search(/\S/); // Find first non-space character
+      if (indentLevel === indent) return i - this.lineIndex;
+      else if(trimmedLine.startsWith('FLOW:')) return -1;
+    }
+    return -1; //file ends
+  }
   /**
    * Update last step to skip current step
    * @param {Step} parentStep 
@@ -195,7 +208,19 @@ class FlowParser {
     // TODO: validate it is not first step of FLOW or LOOP
 
     if(currentStep.type === "SKIP") { // point current step to loop back
-      this.sourceStep(parentStep, lastStep).point(this.findParentStep("LOOP"));
+      this.sourceStep(parentStep, lastStep).point(this.findParentStep("LOOP").step);
+    }else if(currentStep.type === "STOP") { // point current step to next step after LOOP
+      const sStep = this.sourceStep(parentStep, lastStep);
+      const targetStepDetail = this.findParentStep("LOOP");
+      
+      const ind = this.findNextStepIndexOnIndent(targetStepDetail.indent);
+      if(ind === -1){
+        //point to END of flow
+        this.pendingPointers.push([sStep.index, ind]);
+        
+      }else{
+        this.pendingPointers.push([sStep.index, currentStep.index + ind]);
+      }
     }else if(currentStep.type === "END") { // point current step to null
       this.sourceStep(parentStep, lastStep).point(null);
       this.currentFlow.exitSteps.push(lastStep);
@@ -210,17 +235,31 @@ class FlowParser {
     }
     // TODO: validate no step after this
   }
+
+  /**
+   * Set the pointer to all the steps pointed by STOP or GOTO 
+   * @param {Flow} flow 
+   */
   resolvePendingPointers(flow){
     this.pendingPointers.forEach(item => {
       const sourceStep = flow.index[item[0]];
       const targetStep = flow.index[item[1]];
 
-      if(!targetStep) throw Error("Invalid target step");
+      if(item[1] === -1) {
+        sourceStep.nextStep[0] = null;
+        this.currentFlow.exitSteps.push(sourceStep);
+      }else if(!targetStep) throw Error("Invalid target step");
       else sourceStep.nextStep[0] = targetStep;
     });
     this.pendingPointers = [];
   }
   
+  /**
+   * Return the appropriate step that should point next step
+   * @param {Step} parentStep 
+   * @param {Step} lastStep 
+   * @returns 
+   */
   sourceStep(parentStep, lastStep){
     if (isFirstStep(parentStep)) return parentStep;
     else return lastStep;

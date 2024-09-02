@@ -1,7 +1,7 @@
 const FlowParser = require("../src/FlowParser"); 
 const {customDeepEqual, toSafeString} = require("./util"); 
 
-describe("Flow Parser", function() {
+describe("Flow Parser: LOOP", function() {
   it("should parse flow with loop", function() {
     const flowText = `
         FLOW: Sample flow 1
@@ -155,7 +155,8 @@ describe("Flow Parser", function() {
     // console.log(toSafeString(flows["Sample flow 1"]));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
-
+});
+describe("Flow Parser: LOOP: SKIP", function() {
   it("should parse flow with loop with SKIP", function() {
     const flowText = `
         FLOW: Sample flow 1
@@ -391,6 +392,164 @@ describe("Flow Parser", function() {
       },
       "exitSteps": [
         "Point to step 6: DO C"
+      ]
+    };
+    const parser = new FlowParser();
+    const flows = parser.parse(flowText);
+    // console.log(toSafeString(flows["Sample flow 1"]));
+    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+  });
+});
+
+describe("Flow Parser: LOOP: STOP", function() {
+  it("should parse flow with loop with STOP", function() {
+    const flowText = `
+        FLOW: Sample flow 1
+        version: 1.0
+        threshold: 5000
+        LOOP condition 1
+          Do A
+          IF condition 2
+            DO D
+            STOP
+          DO B
+        DO C`;
+
+    const expected = {
+      "name": "Sample flow 1",
+      "headers": {
+        "version": 1,
+        "threshold": 5000
+      },
+      "steps": [
+        {
+          "msg": "condition 1",
+          "nextStep": [
+            {
+              "msg": "A",
+              "nextStep": [
+                {
+                  "msg": "condition 2",
+                  "nextStep": [
+                    {
+                      "msg": "D",
+                      "nextStep": [
+                        {
+                          "msg": "C",
+                          "nextStep": [],
+                          "index": 6,
+                          "type": "DO"
+                        }
+                      ],
+                      "index": 3,
+                      "type": "DO"
+                    },
+                    {
+                      "msg": "B",
+                      "nextStep": [
+                        "Point to step 0: LOOP condition 1"
+                      ],
+                      "index": 5,
+                      "type": "DO"
+                    }
+                  ],
+                  "index": 2,
+                  "type": "IF"
+                }
+              ],
+              "index": 1,
+              "type": "Do"
+            },
+            "Point to step 6: DO C"
+          ],
+          "index": 0,
+          "type": "LOOP"
+        }
+      ],
+      "index": {
+        "0": "Point to step 0: LOOP condition 1",
+        "1": "Point to step 1: Do A",
+        "2": "Point to step 2: IF condition 2",
+        "3": "Point to step 3: DO D",
+        "5": "Point to step 5: DO B",
+        "6": "Point to step 6: DO C"
+      },
+      "exitSteps": [
+        "Point to step 6: DO C"
+      ]
+    };
+    const parser = new FlowParser();
+    const flows = parser.parse(flowText);
+    // console.log(toSafeString(flows["Sample flow 1"]));
+    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+  });
+  it("should parse flow with loop with STOP, no ending step", function() {
+    const flowText = `
+        FLOW: Sample flow 1
+        version: 1.0
+        threshold: 5000
+        LOOP condition 1
+          Do A
+          IF condition 2
+            DO D
+            STOP
+          DO B`;
+
+    const expected = {
+      "name": "Sample flow 1",
+      "headers": {
+        "version": 1,
+        "threshold": 5000
+      },
+      "steps": [
+        {
+          "msg": "condition 1",
+          "nextStep": [
+            {
+              "msg": "A",
+              "nextStep": [
+                {
+                  "msg": "condition 2",
+                  "nextStep": [
+                    {
+                      "msg": "D",
+                      "nextStep": [
+                        null
+                      ],
+                      "index": 3,
+                      "type": "DO"
+                    },
+                    {
+                      "msg": "B",
+                      "nextStep": [
+                        "Point to step 0: LOOP condition 1"
+                      ],
+                      "index": 5,
+                      "type": "DO"
+                    }
+                  ],
+                  "index": 2,
+                  "type": "IF"
+                }
+              ],
+              "index": 1,
+              "type": "Do"
+            }
+          ],
+          "index": 0,
+          "type": "LOOP"
+        }
+      ],
+      "index": {
+        "0": "Point to step 0: LOOP condition 1",
+        "1": "Point to step 1: Do A",
+        "2": "Point to step 2: IF condition 2",
+        "3": "Point to step 3: DO D",
+        "5": "Point to step 5: DO B"
+      },
+      "exitSteps": [
+        "Point to step 0: LOOP condition 1",
+        "Point to step 3: DO D"
       ]
     };
     const parser = new FlowParser();
