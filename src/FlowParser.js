@@ -10,6 +10,7 @@ class FlowParser {
     this.lines = [];
     this.counter = 0;
     this.levelContext = [];
+    this.pendingPointers = [];
   }
 
   parse(flowText) {
@@ -39,6 +40,7 @@ class FlowParser {
         const root = new Step("!", "!", -1);
         this.currentFlow.exitSteps = this.currentFlow.exitSteps.concat(this.parseSteps(root, -1)); // Start parsing with initial indent level
         this.currentFlow.steps = root.nextStep;
+        this.resolvePendingPointers(this.currentFlow);
       }
     }
   }
@@ -84,7 +86,6 @@ class FlowParser {
         this.lineIndex--; // Roll back to reprocess this line in the outer loop
         break;
       } 
-      console.log(trimmedLine);
 
       currentStep = this.createStep(trimmedLine);
       exitSteps = this.pointExitSteps(exitSteps, currentStep);
@@ -160,6 +161,7 @@ class FlowParser {
 
 
   createStep(trimmedLine) {
+    console.log(trimmedLine);
     const [stepType, stepMsg] = readStep(trimmedLine);
     const step = new Step(stepType, stepMsg, this.counter);
     if(!isLeavingStep(stepType))
@@ -190,20 +192,43 @@ class FlowParser {
    * @param {Step} currentStep 
    */
   updateForLeavingStep(parentStep, lastStep, currentStep){
+    // TODO: validate it is not first step of FLOW or LOOP
+
     if(currentStep.type === "SKIP") { // point current step to loop back
-      this.pointLeavingStepTo(parentStep, lastStep, this.findParentStep("LOOP"));
+      this.sourceStep(parentStep, lastStep).point(this.findParentStep("LOOP"));
     }else if(currentStep.type === "END") { // point current step to null
-      this.pointLeavingStepTo(parentStep, lastStep, null);
+      this.sourceStep(parentStep, lastStep).point(null);
+      this.currentFlow.exitSteps.push(lastStep);
+    }else if(currentStep.type === "GOTO") { // point current step to null
+      const sStep = this.sourceStep(parentStep, lastStep);
+
+      const targetStepIndex = currentStep.msg.match(/\d+/)[0]; // must not point to ELSE, SKIP, END, or GOTO statement
+      this.pendingPointers.push([sStep.index, +targetStepIndex]);
+      
+      sStep.point(null);
       this.currentFlow.exitSteps.push(lastStep);
     }
+    // TODO: validate no step after this
+  }
+  resolvePendingPointers(flow){
+    this.pendingPointers.forEach(item => {
+      const sourceStep = flow.index[item[0]];
+      const targetStep = flow.index[item[1]];
+
+      if(!targetStep) throw Error("Invalid target step");
+      else sourceStep.nextStep[0] = targetStep;
+    });
+    this.pendingPointers = [];
+  }
+  
+  sourceStep(parentStep, lastStep){
+    if (isFirstStep(parentStep)) return parentStep;
+    else return lastStep;
   }
 
-  pointLeavingStepTo(parentStep, lastStep, targetStep){
-    // TODO: validate it is not first step of FLOW or LOOP
-    if (isFirstStep(parentStep)) parentStep.point(targetStep);
-    else lastStep.point(targetStep);
-    // TODO: validate no step after SKIP
-  }
+
+  // End: Validation rules
+
 }
 
 
