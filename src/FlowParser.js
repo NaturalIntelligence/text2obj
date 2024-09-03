@@ -1,6 +1,7 @@
 const {Step,Flow} = require("./Node");
 const leavingSteps = ["SKIP","END","GOTO","STOP"];
 const branchSteps = ["IF","ELSE","ELSE_IF","LOOP"];
+const normalSteps = ["AND","THEN","BUT","FOLLOW", "ERR"];
 
 class FlowParser {
   constructor() {
@@ -162,7 +163,11 @@ class FlowParser {
 
   createStep(trimmedLine) {
     console.log(trimmedLine);
-    const [stepType, stepMsg] = readStep(trimmedLine);
+    let [stepType, stepMsg] = readStep(trimmedLine);
+    if(!isSupportedKeyword(stepType)) {
+      stepType = "";
+      stepMsg = trimmedLine;
+    }
     const step = new Step(stepType, stepMsg, this.counter);
     if(!isLeavingStep(stepType))
       this.currentFlow.index[this.counter] = step;
@@ -280,8 +285,10 @@ function isLeavingStep(stepType){
 function isBranchStep(stepType){
   return branchSteps.indexOf(stepType) !== -1;
 }
-function isSupportedKeyword(){
-  return true;
+function isSupportedKeyword(k){
+  return leavingSteps.indexOf(k) !== -1 || 
+    branchSteps.indexOf(k) !== -1 ||
+    normalSteps.indexOf(k) !== -1;
 }
 function readStep(step) {
   const index = step.indexOf(' ');

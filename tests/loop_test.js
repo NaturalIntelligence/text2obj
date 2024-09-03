@@ -8,7 +8,7 @@ describe("Flow Parser: LOOP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do this
+          DO this
           IF condition 2
             DO that
         DO last`;
@@ -24,18 +24,18 @@ describe("Flow Parser: LOOP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "this",
+              "msg": "DO this",
               "nextStep": [
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     {
-                      "msg": "that",
+                      "msg": "DO that",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
                       "index": 3,
-                      "type": "DO"
+                      "type": ""
                     },
                     "Point to step 0: LOOP condition 1"
                   ],
@@ -44,13 +44,13 @@ describe("Flow Parser: LOOP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             },
             {
-              "msg": "last",
+              "msg": "DO last",
               "nextStep": [],
               "index": 4,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -59,7 +59,7 @@ describe("Flow Parser: LOOP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do this",
+        "1": "Point to step 1: DO this",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: DO that",
         "4": "Point to step 4: DO last"
@@ -79,7 +79,7 @@ describe("Flow Parser: LOOP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do A
+          DO A
           IF condition 2
             IF condition 3
               DO B
@@ -96,7 +96,7 @@ describe("Flow Parser: LOOP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "A",
+              "msg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
@@ -105,12 +105,12 @@ describe("Flow Parser: LOOP", function() {
                       "msg": "condition 3",
                       "nextStep": [
                         {
-                          "msg": "B",
+                          "msg": "DO B",
                           "nextStep": [
                             "Point to step 0: LOOP condition 1"
                           ],
                           "index": 4,
-                          "type": "DO"
+                          "type": ""
                         },
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -124,13 +124,13 @@ describe("Flow Parser: LOOP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             },
             {
-              "msg": "C",
+              "msg": "DO C",
               "nextStep": [],
               "index": 5,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -139,7 +139,7 @@ describe("Flow Parser: LOOP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do A",
+        "1": "Point to step 1: DO A",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: IF condition 3",
         "4": "Point to step 4: DO B",
@@ -163,7 +163,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do A
+          DO A
           IF condition 2
             SKIP
           DO B
@@ -180,19 +180,19 @@ describe("Flow Parser: LOOP: SKIP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "A",
+              "msg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     "Point to step 0: LOOP condition 1",
                     {
-                      "msg": "B",
+                      "msg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
                       "index": 4,
-                      "type": "DO"
+                      "type": ""
                     }
                   ],
                   "index": 2,
@@ -200,13 +200,13 @@ describe("Flow Parser: LOOP: SKIP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             },
             {
-              "msg": "C",
+              "msg": "DO C",
               "nextStep": [],
               "index": 5,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -215,7 +215,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do A",
+        "1": "Point to step 1: DO A",
         "2": "Point to step 2: IF condition 2",
         "4": "Point to step 4: DO B",
         "5": "Point to step 5: DO C"
@@ -235,7 +235,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do A
+          DO A
           IF condition 2
             DO K
           ELSE
@@ -254,25 +254,25 @@ describe("Flow Parser: LOOP: SKIP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "A",
+              "msg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     {
-                      "msg": "K",
+                      "msg": "DO K",
                       "nextStep": [
                         {
-                          "msg": "B",
+                          "msg": "DO B",
                           "nextStep": [
                             "Point to step 0: LOOP condition 1"
                           ],
                           "index": 6,
-                          "type": "DO"
+                          "type": ""
                         }
                       ],
                       "index": 3,
-                      "type": "DO"
+                      "type": ""
                     },
                     "Point to step 0: LOOP condition 1"
                   ],
@@ -281,13 +281,13 @@ describe("Flow Parser: LOOP: SKIP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             },
             {
-              "msg": "C",
+              "msg": "DO C",
               "nextStep": [],
               "index": 7,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -296,7 +296,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do A",
+        "1": "Point to step 1: DO A",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: DO K",
         "4": {
@@ -324,7 +324,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do A
+          DO A
           IF condition 2
             DO K 
             SKIP
@@ -342,26 +342,26 @@ describe("Flow Parser: LOOP: SKIP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "A",
+              "msg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     {
-                      "msg": "K",
+                      "msg": "DO K",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
                       "index": 3,
-                      "type": "DO"
+                      "type": ""
                     },
                     {
-                      "msg": "B",
+                      "msg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
                       "index": 5,
-                      "type": "DO"
+                      "type": ""
                     }
                   ],
                   "index": 2,
@@ -369,13 +369,13 @@ describe("Flow Parser: LOOP: SKIP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             },
             {
-              "msg": "C",
+              "msg": "DO C",
               "nextStep": [],
               "index": 6,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -384,7 +384,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do A",
+        "1": "Point to step 1: DO A",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: DO K",
         "5": "Point to step 5: DO B",
@@ -408,7 +408,7 @@ describe("Flow Parser: LOOP: STOP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do A
+          DO A
           IF condition 2
             DO D
             STOP
@@ -426,31 +426,31 @@ describe("Flow Parser: LOOP: STOP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "A",
+              "msg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     {
-                      "msg": "D",
+                      "msg": "DO D",
                       "nextStep": [
                         {
-                          "msg": "C",
+                          "msg": "DO C",
                           "nextStep": [],
                           "index": 6,
-                          "type": "DO"
+                          "type": ""
                         }
                       ],
                       "index": 3,
-                      "type": "DO"
+                      "type": ""
                     },
                     {
-                      "msg": "B",
+                      "msg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
                       "index": 5,
-                      "type": "DO"
+                      "type": ""
                     }
                   ],
                   "index": 2,
@@ -458,7 +458,7 @@ describe("Flow Parser: LOOP: STOP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             },
             "Point to step 6: DO C"
           ],
@@ -468,7 +468,7 @@ describe("Flow Parser: LOOP: STOP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do A",
+        "1": "Point to step 1: DO A",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: DO D",
         "5": "Point to step 5: DO B",
@@ -489,7 +489,7 @@ describe("Flow Parser: LOOP: STOP", function() {
         version: 1.0
         threshold: 5000
         LOOP condition 1
-          Do A
+          DO A
           IF condition 2
             DO D
             STOP
@@ -506,26 +506,26 @@ describe("Flow Parser: LOOP: STOP", function() {
           "msg": "condition 1",
           "nextStep": [
             {
-              "msg": "A",
+              "msg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     {
-                      "msg": "D",
+                      "msg": "DO D",
                       "nextStep": [
                         null
                       ],
                       "index": 3,
-                      "type": "DO"
+                      "type": ""
                     },
                     {
-                      "msg": "B",
+                      "msg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
                       "index": 5,
-                      "type": "DO"
+                      "type": ""
                     }
                   ],
                   "index": 2,
@@ -533,7 +533,7 @@ describe("Flow Parser: LOOP: STOP", function() {
                 }
               ],
               "index": 1,
-              "type": "Do"
+              "type": ""
             }
           ],
           "index": 0,
@@ -542,7 +542,7 @@ describe("Flow Parser: LOOP: STOP", function() {
       ],
       "index": {
         "0": "Point to step 0: LOOP condition 1",
-        "1": "Point to step 1: Do A",
+        "1": "Point to step 1: DO A",
         "2": "Point to step 2: IF condition 2",
         "3": "Point to step 3: DO D",
         "5": "Point to step 5: DO B"

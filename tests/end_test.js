@@ -17,10 +17,10 @@ describe("Flow Parser", function() {
       },
       "steps": [
         {
-          "msg": "A",
+          "msg": "DO A",
           "nextStep": [null],
           "index": 0,
-          "type": "DO"
+          "type": ""
         }
       ],
       "index": {
@@ -56,10 +56,10 @@ describe("Flow Parser", function() {
           "nextStep": [
             null,
             {
-              "msg": "B",
+              "msg": "DO B",
               "nextStep": [],
               "index": 2,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -101,18 +101,18 @@ describe("Flow Parser", function() {
           "msg": "A",
           "nextStep": [
             {
-              "msg": "E",
+              "msg": "DO E",
               "nextStep": [
                 null
               ],
               "index": 1,
-              "type": "DO"
+              "type": ""
             },
             {
-              "msg": "B",
+              "msg": "DO B",
               "nextStep": [],
               "index": 3,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,
@@ -155,10 +155,10 @@ describe("Flow Parser", function() {
           "nextStep": [
             null,
             {
-              "msg": "D",
+              "msg": "DO D",
               "nextStep": [],
               "index": 2,
-              "type": "DO"
+              "type": ""
             }
           ],
           "index": 0,

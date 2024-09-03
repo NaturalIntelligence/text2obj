@@ -45,6 +45,7 @@ function compare(expected,actual,key){
 }
 
 function circularRefMsg(step){
+  if(step.type === "") return `Point to step ${step.index}: ${step.msg}`
   return `Point to step ${step.index}: ${step.type} ${step.msg}`
 }
 // safely handles circular references

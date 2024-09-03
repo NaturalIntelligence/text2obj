@@ -38,10 +38,10 @@ describe("Flow Parser", function() {
       },
       "steps": [
         {
-          "msg": "Yes",
+          "msg": "DO Yes",
           "nextStep": [],
           "index": 0,
-          "type": "DO"
+          "type": ""
         }
       ],
       "index": {
@@ -71,17 +71,17 @@ describe("Flow Parser", function() {
         "msg": "cond",
         "nextStep": [
           {
-            "msg": "No",
+            "msg": "DO No",
             "nextStep": [
               {
-                "msg": "Yeah",
+                "msg": "DO Yeah",
                 "nextStep": [],
                 "index": 2,
-                "type": "DO"
+                "type": ""
               }
             ],
             "index": 1,
-            "type": "DO"
+            "type": ""
           },
           "Point to step 2: DO Yeah"
         ],
@@ -117,10 +117,10 @@ describe("Flow Parser", function() {
             "msg": "condition",
             "nextStep": [
               {
-                "msg": "Yes",
+                "msg": "DO Yes",
                 "nextStep": [],
                 "index": 1,
-                "type": "DO"
+                "type": ""
               }
             ],
             "index": 0,
@@ -165,16 +165,16 @@ describe("Flow Parser", function() {
               "msg": "1",
               "nextStep": [
                 {
-                  "msg": "A",
+                  "msg": "DO A",
                   "nextStep": [],
                   "index": 2,
-                  "type": "DO"
+                  "type": ""
                 },
                 {
-                  "msg": "B",
+                  "msg": "DO B",
                   "nextStep": [],
                   "index": 4,
-                  "type": "DO"
+                  "type": ""
                 }
               ],
               "index": 1,
@@ -225,17 +225,17 @@ describe("Flow Parser", function() {
             "msg": "condition 2",
             "nextStep": [
               {
-                "msg": "Yes",
+                "msg": "DO Yes",
                 "nextStep": [
                   {
-                    "msg": "No",
+                    "msg": "DO No",
                     "nextStep": [],
                     "index": 3,
-                    "type": "DO"
+                    "type": ""
                   }
                 ],
                 "index": 2,
-                "type": "DO"
+                "type": ""
               },
               "Point to step 3: DO No"
             ],
@@ -275,42 +275,42 @@ DO E`;
       },
       "steps": [
         {
-          "msg": "A",
+          "msg": "DO A",
           "nextStep": [
             {
               "msg": "condition 1",
               "nextStep": [
                 {
-                  "msg": "C",
+                  "msg": "DO C",
                   "nextStep": [
                     {
-                      "msg": "E",
+                      "msg": "DO E",
                       "nextStep": [],
                       "index": 7,
-                      "type": "DO"
+                      "type": ""
                     }
                   ],
                   "index": 2,
-                  "type": "DO"
+                  "type": ""
                 },
                 {
                   "msg": "condition 2",
                   "nextStep": [
                     {
-                      "msg": "K",
+                      "msg": "DO K",
                       "nextStep": [
                         "Point to step 7: DO E"
                       ],
                       "index": 4,
-                      "type": "DO"
+                      "type": ""
                     },
                     {
-                      "msg": "D",
+                      "msg": "DO D",
                       "nextStep": [
                         "Point to step 7: DO E"
                       ],
                       "index": 6,
-                      "type": "DO"
+                      "type": ""
                     }
                   ],
                   "index": 3,
@@ -322,7 +322,7 @@ DO E`;
             }
           ],
           "index": 0,
-          "type": "DO"
+          "type": ""
         }
       ],
       "index": {
