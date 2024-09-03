@@ -1,14 +1,14 @@
 {
   "name": "algoflow",
   "version": "1.0.0",
-  "description": "WIP",
+  "description": "construct in-memory object for a flow",
   "main": "index.js",
   "scripts": {
     "test": "jasmine tests/*_test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NaturalIntelligence/algoflow.git"
+    "url": "https://github.com/NaturalIntelligence/algoflow.git"
   },
   "keywords": [],
   "author": "Amit Gupta (https://solothought.com)",
