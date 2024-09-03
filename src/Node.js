@@ -1,7 +1,8 @@
 class Step {
-  constructor(type, msg, index) {
+  constructor(type, msg, rawMsg, index) {
     //some steps might not have any message
-    if(msg) this.msg = msg.trim(); //TODO: remove data in parenthesis
+    if(msg) this.msg = msg; //TODO: remove data in parenthesis
+    if(rawMsg) this.rawMsg = rawMsg;
     this.nextStep = [];    // every conditional block has 2 branch
     this.index = index;
     this.type = type;

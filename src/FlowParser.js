@@ -161,6 +161,10 @@ class FlowParser {
   }
 
 
+  /**
+   * @param {string} trimmedLine 
+   * @returns {Step}
+   */
   createStep(trimmedLine) {
     // console.log(trimmedLine);
     let [stepType, stepMsg] = readStep(trimmedLine);
@@ -168,12 +172,16 @@ class FlowParser {
       stepType = "";
       stepMsg = trimmedLine;
     }
-    const step = new Step(stepType, stepMsg, this.counter);
+    const rawMsg = stepMsg;
+    stepMsg = refinedMsg(stepMsg).trim();
+    const step = new Step(stepType, stepMsg, rawMsg, this.counter);
     if(!isLeavingStep(stepType))
       this.currentFlow.index[this.counter] = step;
     this.counter++;
     return step;
   }
+
+  
 
   processLevel(currentStep, indentLevel) {
     this.levelContext.push({step:currentStep,indent:indentLevel}); //TODO: setting wrong for ELSE level
@@ -298,6 +306,10 @@ function readStep(step) {
       step.substring(0, index),
       step.substring(index + 1)
     ]
+}
+
+function refinedMsg(msg){
+  return msg.replace(/\([^)]*\)/g, '').replace(/\s\s/g,' ');
 }
 
 module.exports = FlowParser;

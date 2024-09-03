@@ -39,6 +39,7 @@ describe("Flow Parser", function() {
       "steps": [
         {
           "msg": "DO Yes",
+          "rawMsg": "DO Yes",
           "nextStep": [],
           "index": 0,
           "type": ""
@@ -69,12 +70,15 @@ describe("Flow Parser", function() {
     const expectedSteps = [
       {
         "msg": "cond",
+        "rawMsg": "cond",
         "nextStep": [
           {
             "msg": "DO No",
+            "rawMsg": "DO No",
             "nextStep": [
               {
                 "msg": "DO Yeah",
+                "rawMsg": "DO Yeah",
                 "nextStep": [],
                 "index": 2,
                 "type": ""
@@ -115,9 +119,11 @@ describe("Flow Parser", function() {
         "steps": [
           {
             "msg": "condition",
+            "rawMsg": "condition",
             "nextStep": [
               {
                 "msg": "DO Yes",
+                "rawMsg": "DO Yes",
                 "nextStep": [],
                 "index": 1,
                 "type": ""
@@ -160,18 +166,22 @@ describe("Flow Parser", function() {
       "steps": [
         {
           "msg": "2",
+          "rawMsg": "2",
           "nextStep": [
             {
               "msg": "1",
+              "rawMsg": "1",
               "nextStep": [
                 {
                   "msg": "DO A",
+                  "rawMsg": "DO A",
                   "nextStep": [],
                   "index": 2,
                   "type": ""
                 },
                 {
                   "msg": "DO B",
+                  "rawMsg": "DO B",
                   "nextStep": [],
                   "index": 4,
                   "type": ""
@@ -220,15 +230,19 @@ describe("Flow Parser", function() {
     const expected = [
       {
         "msg": "condition 1",
+        "rawMsg": "condition 1",
         "nextStep": [
           {
             "msg": "condition 2",
+            "rawMsg": "condition 2",
             "nextStep": [
               {
                 "msg": "DO Yes",
+                "rawMsg": "DO Yes",
                 "nextStep": [
                   {
                     "msg": "DO No",
+                    "rawMsg": "DO No",
                     "nextStep": [],
                     "index": 3,
                     "type": ""
@@ -276,15 +290,19 @@ DO E`;
       "steps": [
         {
           "msg": "DO A",
+          "rawMsg": "DO A",
           "nextStep": [
             {
               "msg": "condition 1",
+              "rawMsg": "condition 1",
               "nextStep": [
                 {
                   "msg": "DO C",
+                  "rawMsg": "DO C",
                   "nextStep": [
                     {
                       "msg": "DO E",
+                      "rawMsg": "DO E",
                       "nextStep": [],
                       "index": 7,
                       "type": ""
@@ -295,9 +313,11 @@ DO E`;
                 },
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO K",
+                      "rawMsg": "DO K",
                       "nextStep": [
                         "Point to step 7: DO E"
                       ],
@@ -306,6 +326,7 @@ DO E`;
                     },
                     {
                       "msg": "DO D",
+                      "rawMsg": "DO D",
                       "nextStep": [
                         "Point to step 7: DO E"
                       ],

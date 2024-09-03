@@ -27,6 +27,7 @@ describe("Flow Parser", function() {
           "steps": [
             {
               "msg": "Add both values",
+              "rawMsg": "Add both values",
               "nextStep": [],
               "index": 0,
               "type": ""
@@ -48,18 +49,23 @@ describe("Flow Parser", function() {
           "steps": [
             {
               "msg": "condition 1",
+              "rawMsg": "condition 1",
               "nextStep": [
                 {
                   "msg": "DO A",
+                  "rawMsg": "DO A",
                   "nextStep": [
                     {
                       "msg": "condition 2",
+                      "rawMsg": "condition 2",
                       "nextStep": [
                         {
                           "msg": "Addition",
+                          "rawMsg": "Addition",
                           "nextStep": [
                             {
                               "msg": "DO B",
+                              "rawMsg": "DO B",
                               "nextStep": [
                                 "Point to step 0: LOOP condition 1"
                               ],
@@ -81,6 +87,7 @@ describe("Flow Parser", function() {
                 },
                 {
                   "msg": "DO C",
+                  "rawMsg": "DO C",
                   "nextStep": [],
                   "index": 5,
                   "type": ""

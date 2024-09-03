@@ -23,16 +23,20 @@ describe("Flow Parser", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     "Point to step 1: DO A",
                     {
                       "msg": "DO B",
+                      "rawMsg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -49,6 +53,7 @@ describe("Flow Parser", function() {
             },
             {
               "msg": "DO C",
+              "rawMsg": "DO C",
               "nextStep": [],
               "index": 5,
               "type": ""
@@ -98,18 +103,23 @@ describe("Flow Parser", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO D",
+                      "rawMsg": "DO D",
                       "nextStep": [
                         {
                           "msg": "DO B",
+                          "rawMsg": "DO B",
                           "nextStep": [
                             "Point to step 1: DO A"
                           ],
@@ -131,6 +141,7 @@ describe("Flow Parser", function() {
             },
             {
               "msg": "DO C",
+              "rawMsg": "DO C",
               "nextStep": [],
               "index": 7,
               "type": ""

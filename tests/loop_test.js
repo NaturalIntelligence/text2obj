@@ -22,15 +22,19 @@ describe("Flow Parser: LOOP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO this",
+              "rawMsg": "DO this",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO that",
+                      "rawMsg": "DO that",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -48,6 +52,7 @@ describe("Flow Parser: LOOP", function() {
             },
             {
               "msg": "DO last",
+              "rawMsg": "DO last",
               "nextStep": [],
               "index": 4,
               "type": ""
@@ -94,18 +99,23 @@ describe("Flow Parser: LOOP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "condition 3",
+                      "rawMsg": "condition 3",
                       "nextStep": [
                         {
                           "msg": "DO B",
+                          "rawMsg": "DO B",
                           "nextStep": [
                             "Point to step 0: LOOP condition 1"
                           ],
@@ -128,6 +138,7 @@ describe("Flow Parser: LOOP", function() {
             },
             {
               "msg": "DO C",
+              "rawMsg": "DO C",
               "nextStep": [],
               "index": 5,
               "type": ""
@@ -178,16 +189,20 @@ describe("Flow Parser: LOOP: SKIP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     "Point to step 0: LOOP condition 1",
                     {
                       "msg": "DO B",
+                      "rawMsg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -204,6 +219,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
             },
             {
               "msg": "DO C",
+              "rawMsg": "DO C",
               "nextStep": [],
               "index": 5,
               "type": ""
@@ -252,18 +268,23 @@ describe("Flow Parser: LOOP: SKIP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO K",
+                      "rawMsg": "DO K",
                       "nextStep": [
                         {
                           "msg": "DO B",
+                          "rawMsg": "DO B",
                           "nextStep": [
                             "Point to step 0: LOOP condition 1"
                           ],
@@ -285,6 +306,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
             },
             {
               "msg": "DO C",
+              "rawMsg": "DO C",
               "nextStep": [],
               "index": 7,
               "type": ""
@@ -340,15 +362,19 @@ describe("Flow Parser: LOOP: SKIP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO K",
+                      "rawMsg": "DO K",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -357,6 +383,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
                     },
                     {
                       "msg": "DO B",
+                      "rawMsg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -373,6 +400,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
             },
             {
               "msg": "DO C",
+              "rawMsg": "DO C",
               "nextStep": [],
               "index": 6,
               "type": ""
@@ -424,18 +452,23 @@ describe("Flow Parser: LOOP: STOP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO D",
+                      "rawMsg": "DO D",
                       "nextStep": [
                         {
                           "msg": "DO C",
+                          "rawMsg": "DO C",
                           "nextStep": [],
                           "index": 6,
                           "type": ""
@@ -446,6 +479,7 @@ describe("Flow Parser: LOOP: STOP", function() {
                     },
                     {
                       "msg": "DO B",
+                      "rawMsg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
@@ -504,15 +538,19 @@ describe("Flow Parser: LOOP: STOP", function() {
       "steps": [
         {
           "msg": "condition 1",
+          "rawMsg": "condition 1",
           "nextStep": [
             {
               "msg": "DO A",
+              "rawMsg": "DO A",
               "nextStep": [
                 {
                   "msg": "condition 2",
+                  "rawMsg": "condition 2",
                   "nextStep": [
                     {
                       "msg": "DO D",
+                      "rawMsg": "DO D",
                       "nextStep": [
                         null
                       ],
@@ -521,6 +559,7 @@ describe("Flow Parser: LOOP: STOP", function() {
                     },
                     {
                       "msg": "DO B",
+                      "rawMsg": "DO B",
                       "nextStep": [
                         "Point to step 0: LOOP condition 1"
                       ],
