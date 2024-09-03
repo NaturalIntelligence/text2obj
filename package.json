@@ -2,7 +2,7 @@
   "name": "algoflow",
   "version": "1.0.0",
   "description": "construct in-memory object for a flow",
-  "main": "index.js",
+  "main": "./src/FlowParser.js",
   "scripts": {
     "test": "jasmine tests/*_test.js"
   },
