@@ -21,7 +21,7 @@ class FlowParser {
   }
 
   parseFlow() {
-    console.log("reading flow");
+    // console.log("reading flow");
 
     for (; this.lineIndex < this.lines.length; this.lineIndex++) {
 
@@ -31,7 +31,7 @@ class FlowParser {
 
       if (trimmedLine.startsWith('FLOW:')) {
         const flowName = trimmedLine.substring(6);
-        console.log("flow", flowName);
+        // console.log("flow", flowName);
         
         this.counter = 0;
         this.currentFlow = new Flow(flowName);
@@ -47,7 +47,7 @@ class FlowParser {
   }
 
   parseHeaders() {
-    console.log("reading headers");
+    // console.log("reading headers");
 
     while (this.lineIndex < this.lines.length) {
       const line = this.lines[this.lineIndex].trim();
@@ -162,7 +162,7 @@ class FlowParser {
 
 
   createStep(trimmedLine) {
-    console.log(trimmedLine);
+    // console.log(trimmedLine);
     let [stepType, stepMsg] = readStep(trimmedLine);
     if(!isSupportedKeyword(stepType)) {
       stepType = "";
