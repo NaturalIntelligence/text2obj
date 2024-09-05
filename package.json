@@ -1,5 +1,5 @@
 {
-  "name": "algoflow",
+  "name": "flo",
   "version": "1.0.0",
   "description": "construct in-memory object for a flow",
   "main": "./src/FlowParser.js",
