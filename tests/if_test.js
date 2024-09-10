@@ -1,4 +1,4 @@
-const FlowParser = require("../src/FlowParser"); 
+const Slimo = require("../src/Slimo"); 
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
@@ -19,7 +19,7 @@ describe("Flow Parser", function() {
         null
       ]
     };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
@@ -52,7 +52,7 @@ describe("Flow Parser", function() {
         "Point to step 0: DO Yes"
       ]
     }
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -96,7 +96,7 @@ describe("Flow Parser", function() {
     const expectedExitSteps = [
       "Point to step 2: DO Yeah"
     ]
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -142,7 +142,7 @@ describe("Flow Parser", function() {
           "Point to step 0: IF condition"
         ]
       }
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -213,7 +213,7 @@ describe("Flow Parser", function() {
         ]
     }
     
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -262,7 +262,7 @@ describe("Flow Parser", function() {
         "type": "IF"
       }
     ]
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -366,7 +366,7 @@ DO E`;
         "Point to step 7: DO E"
       ]
     }
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));

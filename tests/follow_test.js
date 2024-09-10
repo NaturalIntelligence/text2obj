@@ -1,4 +1,4 @@
-const FlowParser = require("../src/FlowParser"); 
+const Slimo = require("../src/Slimo"); 
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
@@ -110,7 +110,7 @@ describe("Flow Parser", function() {
           ]
         }
       };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows));
     expect(customDeepEqual(flows,expected)).toBeTrue();

@@ -3,7 +3,7 @@ const leavingSteps = ["SKIP","END","GOTO","STOP"];
 const branchSteps = ["IF","ELSE","ELSE_IF","LOOP"];
 const normalSteps = ["AND","THEN","BUT","FOLLOW", "ERR"];
 
-class FlowParser {
+class Slimo {
   constructor() {
     this.flows = {};
     this.currentFlow = null;
@@ -312,4 +312,4 @@ function refinedMsg(msg){
   return msg.replace(/\([^)]*\)/g, '').replace(/\s\s/g,' ');
 }
 
-module.exports = FlowParser;
+module.exports = Slimo;

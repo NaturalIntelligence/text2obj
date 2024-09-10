@@ -1,4 +1,4 @@
-# algoflow
+# Slimo
 
 
 Sample Flow
@@ -23,7 +23,7 @@ DO in end
 ```
 
 ```js
-const parser = new FlowParser();
-const flows = parser.parse(flowText);
+const slimo = new Slimo();
+const flows = slimo.parse(flowText);
 flows['Sample flow 1];
 ```

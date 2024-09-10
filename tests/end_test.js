@@ -1,4 +1,4 @@
-const FlowParser = require("../src/FlowParser"); 
+const Slimo = require("../src/Slimo"); 
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
@@ -31,7 +31,7 @@ describe("Flow Parser", function() {
         "Point to step 0: DO A"
       ]
     };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -78,7 +78,7 @@ describe("Flow Parser", function() {
         "Point to step 2: DO B"
       ]
     };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -135,7 +135,7 @@ describe("Flow Parser", function() {
         "Point to step 3: DO B"
       ]
     };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
@@ -183,7 +183,7 @@ describe("Flow Parser", function() {
       ]
     }
     ;
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));

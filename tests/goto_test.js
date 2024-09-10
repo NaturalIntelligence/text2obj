@@ -1,4 +1,4 @@
-const FlowParser = require("../src/FlowParser"); 
+const Slimo = require("../src/Slimo"); 
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
@@ -75,7 +75,7 @@ describe("Flow Parser", function() {
         "Point to step 5: DO C"
       ]
     };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
@@ -165,7 +165,7 @@ describe("Flow Parser", function() {
         "Point to step 7: DO C"
       ]
     };
-    const parser = new FlowParser();
+    const parser = new Slimo();
     const flows = parser.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
