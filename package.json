@@ -1,6 +1,6 @@
 {
   "name": "slimo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "construct in-memory object for a flow",
   "main": "./src/Slimo.js",
   "scripts": {
