@@ -112,10 +112,7 @@ describe("Flow Parser", function() {
         `;
     const expected = {
         "name": "Sample flow 1",
-        "headers": {
-          "version": 1,
-          "threshold": 7000
-        },
+        "headers": {},
         "steps": [
           {
             "msg": "condition",
@@ -159,10 +156,7 @@ describe("Flow Parser", function() {
         `;
     const expected = {
       "name": "Sample flow 1",
-      "headers": {
-        "version": 1,
-        "threshold": 7000
-      },
+      "headers": {},
       "steps": [
         {
           "msg": "2",

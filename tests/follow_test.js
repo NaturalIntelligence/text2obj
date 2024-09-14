@@ -20,10 +20,7 @@ describe("Flow Parser", function() {
     const expected = {
         "Addition": {
           "name": "Addition",
-          "headers": {
-            "version": 1,
-            "threshold": 7000
-          },
+          "headers": {},
           "steps": [
             {
               "msg": "Add both values",

@@ -25,10 +25,7 @@ class Step {
 class Flow {
   constructor(name) {
     this.name = name;
-    this.headers = {
-      version: 1.0,
-      threshold: 7000 // ms
-    };
+    this.headers = {};
     this.steps = null; // Should point to start Node
     this.index = {};
     this.exitSteps = [];

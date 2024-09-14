@@ -56,7 +56,7 @@ class Slimo {
         continue; // Skip empty lines
       }
 
-      if (line.startsWith('version:') || line.startsWith('threshold:')) {
+      if (line.match(/^[a-z]{1,70}:/)) {
         const [key, value] = line.split(':').map(part => part.trim());
         this.currentFlow.headers[key] = parseFloat(value) || value;
       } else {
