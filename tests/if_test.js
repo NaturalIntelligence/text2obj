@@ -2,6 +2,7 @@ const Slimo = require("../src/Slimo");
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
+
   it("should parse flow with no statement", function() {
     const flowText = `
         FLOW: Sample flow 1
@@ -19,8 +20,8 @@ describe("Flow Parser", function() {
         null
       ]
     };
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
   });
@@ -52,8 +53,8 @@ describe("Flow Parser", function() {
         "Point to step 0: DO Yes"
       ]
     }
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
@@ -96,8 +97,8 @@ describe("Flow Parser", function() {
     const expectedExitSteps = [
       "Point to step 2: DO Yeah"
     ]
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"].steps,expectedSteps)).toBeTrue();
@@ -139,8 +140,8 @@ describe("Flow Parser", function() {
           "Point to step 0: IF condition"
         ]
       }
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
@@ -207,8 +208,8 @@ describe("Flow Parser", function() {
         ]
     }
     
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
@@ -256,8 +257,8 @@ describe("Flow Parser", function() {
         "type": "IF"
       }
     ]
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
@@ -360,8 +361,8 @@ DO E`;
         "Point to step 7: DO E"
       ]
     }
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
     expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();

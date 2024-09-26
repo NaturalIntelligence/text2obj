@@ -23,7 +23,6 @@ DO in end
 ```
 
 ```js
-const slimo = new Slimo();
-const flows = slimo.parse(flowText);
+const flows = Slimo.parse(flowText);
 flows['Sample flow 1];
 ```

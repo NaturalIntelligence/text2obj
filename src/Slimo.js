@@ -4,6 +4,12 @@ const branchSteps = ["IF","ELSE","ELSE_IF","LOOP"];
 const normalSteps = ["AND","THEN","BUT","FOLLOW", "ERR"];
 
 class Slimo {
+  static parse(flowText) {
+    const parser = new Parser();
+    return parser.parse(flowText);
+  }
+}
+class Parser {
   constructor() {
     this.flows = {};
     this.currentFlow = null;

@@ -107,8 +107,8 @@ describe("Flow Parser", function() {
           ]
         }
       };
-    const parser = new Slimo();
-    const flows = parser.parse(flowText);
+    
+    const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows));
     expect(customDeepEqual(flows,expected)).toBeTrue();
   });
