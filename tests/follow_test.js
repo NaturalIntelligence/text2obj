@@ -18,7 +18,7 @@ describe("Flow Parser", function() {
         DO C`;
 
     const expected = {
-        "Addition": {
+        "Addition": [{
           "name": "Addition",
           "headers": {},
           "steps": [
@@ -36,8 +36,8 @@ describe("Flow Parser", function() {
           "exitSteps": [
             "Point to step 0: Add both values"
           ]
-        },
-        "Sample flow 1": {
+        }],
+        "Sample flow 1": [{
           "name": "Sample flow 1",
           "headers": {
             "version": 1,
@@ -105,7 +105,7 @@ describe("Flow Parser", function() {
           "exitSteps": [
             "Point to step 5: DO C"
           ]
-        }
+        }]
       };
     
     const flows = Slimo.parse(flowText);

@@ -41,7 +41,9 @@ class Parser {
         
         this.counter = 0;
         this.currentFlow = new Flow(flowName);
-        this.flows[flowName] = this.currentFlow;
+        if(!this.flows[flowName]) this.flows[flowName] = [];
+        this.flows[flowName].push(this.currentFlow);
+        // this.flows[flowName] = this.currentFlow;
         this.lineIndex++; // Move to next line to process headers and statements
         this.parseHeaders(); // Parse headers
         const root = new Step("!", "!", -1);

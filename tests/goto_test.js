@@ -78,7 +78,7 @@ describe("Flow Parser", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with GOTO after normal step", function() {
     const flowText = `
@@ -168,7 +168,7 @@ describe("Flow Parser", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
 
   });
 

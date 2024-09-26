@@ -76,7 +76,7 @@ describe("Flow Parser: LOOP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with loop and nested IF condition", function() {
     const flowText = `
@@ -164,7 +164,7 @@ describe("Flow Parser: LOOP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });
 describe("Flow Parser: LOOP: SKIP", function() {
@@ -243,7 +243,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with loop with SKIP in ELSE", function() {
     const flowText = `
@@ -338,7 +338,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with loop with SKIP (not fist step)", function() {
     const flowText = `
@@ -425,7 +425,7 @@ describe("Flow Parser: LOOP: SKIP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });
 
@@ -515,7 +515,7 @@ describe("Flow Parser: LOOP: STOP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with loop with STOP, no ending step", function() {
     const flowText = `
@@ -594,6 +594,6 @@ describe("Flow Parser: LOOP: STOP", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });

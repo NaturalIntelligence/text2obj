@@ -35,7 +35,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with IF END", function() {
     const flowText = `
@@ -82,7 +82,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with IF END 2", function() {
     const flowText = `
@@ -139,7 +139,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with LOOP END", function() {
     const flowText = `
@@ -187,6 +187,6 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });

@@ -23,7 +23,7 @@ describe("Flow Parser", function() {
     
     const flows = Slimo.parse(flowText);
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with 1 DO statement", function() {
     const flowText = `
@@ -57,7 +57,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
 
   });
   it("should parse flow with different indentation on same level", function() {
@@ -101,8 +101,8 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"].steps,expectedSteps)).toBeTrue();
-    expect(customDeepEqual(flows["Sample flow 1"].exitSteps,expectedExitSteps)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0].steps,expectedSteps)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0].exitSteps,expectedExitSteps)).toBeTrue();
 
   });
   it("should parse flow with 1 IF statement", function() {
@@ -144,7 +144,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with IF ELSE statement", function() {
     const flowText = `
@@ -212,7 +212,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
   it("should parse flow with nested IF statement", function() {
     const flowText = `
@@ -261,7 +261,7 @@ describe("Flow Parser", function() {
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"].steps,expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0].steps,expected)).toBeTrue();
   });
   it("should parse flow with IF ELSE_IF and ELSE statements", function() {
     const flowText = `
@@ -365,7 +365,7 @@ DO E`;
     const flows = Slimo.parse(flowText);
     // console.log(toSafeString(flows["Sample flow 1"]));
     // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });
 

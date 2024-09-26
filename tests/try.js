@@ -15,6 +15,6 @@ describe("Flow Parser: LOOP", function() {
     
     const flows = Slimo.parse(flowText);
     console.log(toSafeString(flows["first flow"]));
-    // expect(customDeepEqual(flows["Sample flow 1"],expected)).toBeTrue();
+    // expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });
