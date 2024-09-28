@@ -92,6 +92,8 @@ class Parser {
       const indentLevel = line.search(/\S/); // Find first non-space character
       lastStep = currentStep;
       if (trimmedLine.startsWith('FLOW:') || indentLevel <= parentIndentation) {
+        //TODO: exitSteps should be assigned to END
+
         this.lineIndex--; // Roll back to reprocess this line in the outer loop
         break;
       } 
@@ -206,7 +208,7 @@ class Parser {
     throw new Error(`No parent ${stepType} found`);
   }
 
-  findNextStepIndexOnIndent(indent){
+  findNextStepIndexOfLoop(loopIndent){
     let i = this.lineIndex; 
     for (; i < this.lines.length;i++) {
       const line = this.lines[i];
@@ -214,8 +216,8 @@ class Parser {
       if (!trimmedLine) continue; // Skip empty lines
       
       const indentLevel = line.search(/\S/); // Find first non-space character
-      if (indentLevel === indent) return i - this.lineIndex;
-      else if(trimmedLine.startsWith('FLOW:')) return -1;
+      if(trimmedLine.startsWith('FLOW:')) return -1;
+      else if (indentLevel === loopIndent) return i - this.lineIndex;
     }
     return -1; //file ends
   }
@@ -234,7 +236,7 @@ class Parser {
       const sStep = this.sourceStep(parentStep, lastStep);
       const targetStepDetail = this.findParentStep("LOOP");
       
-      const ind = this.findNextStepIndexOnIndent(targetStepDetail.indent);
+      const ind = this.findNextStepIndexOfLoop(targetStepDetail.indent);
       if(ind === -1){
         //point to END of flow
         this.pendingPointers.push([sStep.index, ind]);
