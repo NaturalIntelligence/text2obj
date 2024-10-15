@@ -4,7 +4,8 @@
   "description": "construct in-memory object for a flow",
   "main": "./src/Slimo.js",
   "scripts": {
-    "test": "jasmine tests/*_test.js"
+    "test": "jasmine tests/*_test.js",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,20 @@
     "url": "https://github.com/NaturalIntelligence/slimo/issues"
   },
   "homepage": "https://github.com/NaturalIntelligence/slimo#readme",
-  "funding": [{
-    "type": "github",
-    "url": "https://github.com/sponsors/NaturalIntelligence"
-  },{
-    "type": "paypal",
-    "url": "https://paypal.me/naturalintelligence"
-  }]
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/NaturalIntelligence"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/naturalintelligence"
+    }
+  ],
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.22.5"
+  }
 }
