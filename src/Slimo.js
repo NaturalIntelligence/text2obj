@@ -47,7 +47,8 @@ class Parser {
         this.lineIndex++; // Move to next line to process headers and statements
         this.parseHeaders(); // Parse headers
         const root = new Step("!", "!", -1);
-        this.currentFlow.exitSteps = this.currentFlow.exitSteps.concat(this.parseSteps(root, -1)); // Start parsing with initial indent level
+        const exitSteps = this.parseSteps(root, -1);
+        this.currentFlow.exitSteps = this.currentFlow.exitSteps.concat(exitSteps); // Start parsing with initial indent level
         this.currentFlow.steps = root.nextStep;
         this.resolvePendingPointers(this.currentFlow);
       }
@@ -232,7 +233,7 @@ class Parser {
 
     if(currentStep.type === "SKIP") { // point current step to loop back
       this.sourceStep(parentStep, lastStep).point(this.findParentStep("LOOP").step);
-    }else if(currentStep.type === "STOP") { // point current step to next step after LOOP
+    }else if(currentStep.type === "STOP") { // point current step null to point next step after LOOP later
       const sStep = this.sourceStep(parentStep, lastStep);
       const targetStepDetail = this.findParentStep("LOOP");
       
@@ -240,21 +241,23 @@ class Parser {
       if(ind === -1){
         //point to END of flow
         this.pendingPointers.push([sStep.index, ind]);
-        
+        // this.currentFlow.exitSteps.push(lastStep);  
       }else{
         this.pendingPointers.push([sStep.index, currentStep.index + ind]);
       }
+      sStep.point(null);
+      
     }else if(currentStep.type === "END") { // point current step to null
       this.sourceStep(parentStep, lastStep).point(null);
       this.currentFlow.exitSteps.push(lastStep);
-    }else if(currentStep.type === "GOTO") { // point current step to null
+    }else if(currentStep.type === "GOTO") { // point current step to null to point to given step later
       const sStep = this.sourceStep(parentStep, lastStep);
 
       const targetStepIndex = currentStep.msg.match(/\d+/)[0]; // must not point to ELSE, SKIP, END, or GOTO statement
       this.pendingPointers.push([sStep.index, +targetStepIndex]);
       
       sStep.point(null);
-      this.currentFlow.exitSteps.push(lastStep);
+      // this.currentFlow.exitSteps.push(lastStep);
     }
     // TODO: validate no step after this
   }
@@ -322,4 +325,4 @@ function refinedMsg(msg){
   return msg.replace(/\([^)]*\)/g, '').replace(/\s\s/g,' ');
 }
 
-module.exports = Slimo;
+module.exports = Slimo
