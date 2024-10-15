@@ -1,7 +1,7 @@
 {
   "name": "slimo",
-  "version": "1.3.1",
-  "description": "construct in-memory object for a flow",
+  "version": "1.3.2",
+  "description": "construct in-memory object for a slimo flow",
   "main": "./src/Slimo.js",
   "scripts": {
     "test": "jasmine tests/*_test.js",
@@ -11,9 +11,9 @@
     "type": "git",
     "url": "https://github.com/NaturalIntelligence/slimo.git"
   },
-  "keywords": [],
+  "keywords": ["algorithm","flow"],
   "author": "Amit Gupta (https://solothought.com)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/NaturalIntelligence/slimo/issues"
   },
