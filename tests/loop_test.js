@@ -728,4 +728,69 @@ describe("Flow Parser: LOOP: STOP", function() {
     // console.log(toSafeString(flows["sample"]));
     expect(customDeepEqual(flows["sample"][0],expected)).toBeTrue();
   });
+  it("should point to next step of upper level if no step in LOOP level", function() {
+    const flowText = `
+        FLOW: sample
+        IF K
+          LOOP A
+            IF B
+              STOP
+        D`;
+
+    const expected = [
+      {
+        "name": "sample",
+        "headers": {},
+        "steps": [
+          {
+            "msg": "K",
+            "rawMsg": "K",
+            "nextStep": [
+              {
+                "msg": "A",
+                "rawMsg": "A",
+                "nextStep": [
+                  {
+                    "msg": "B",
+                    "rawMsg": "B",
+                    "nextStep": [
+                      {
+                        "msg": "D",
+                        "rawMsg": "D",
+                        "nextStep": [],
+                        "index": 4,
+                        "type": ""
+                      },
+                      "Point to step 1: LOOP A"
+                    ],
+                    "index": 2,
+                    "type": "IF"
+                  },
+                  "Point to step 4: D"
+                ],
+                "index": 1,
+                "type": "LOOP"
+              },
+              "Point to step 4: D"
+            ],
+            "index": 0,
+            "type": "IF"
+          }
+        ],
+        "index": {
+          "0": "Point to step 0: IF K",
+          "1": "Point to step 1: LOOP A",
+          "2": "Point to step 2: IF B",
+          "4": "Point to step 4: D"
+        },
+        "exitSteps": [
+          "Point to step 4: D"
+        ]
+      }
+    ];
+    
+    const flows = Slimo.parse(flowText);
+    // console.log(toSafeString(flows["sample"]));
+    expect(customDeepEqual(flows["sample"],expected)).toBeTrue();
+  });
 });

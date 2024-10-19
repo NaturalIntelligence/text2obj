@@ -218,7 +218,7 @@ class Parser {
       
       const indentLevel = line.search(/\S/); // Find first non-space character
       if(trimmedLine.startsWith('FLOW:')) return -1;
-      else if (indentLevel === loopIndent) return i - this.lineIndex;
+      else if (indentLevel <= loopIndent) return i - this.lineIndex;
     }
     return -1; //file ends
   }
