@@ -793,4 +793,81 @@ describe("Flow Parser: LOOP: STOP", function() {
     // console.log(toSafeString(flows["sample"]));
     expect(customDeepEqual(flows["sample"],expected)).toBeTrue();
   });
+  it("should point to next non-ELSE step of upper level if no step in LOOP level", function() {
+    const flowText = `
+        FLOW: sample
+        IF K
+          LOOP A
+            IF B
+              STOP
+        ELSE_IF C
+          D`;
+
+    const expected = [
+      {
+        "name": "sample",
+        "headers": {},
+        "steps": [
+          {
+            "msg": "K",
+            "rawMsg": "K",
+            "nextStep": [
+              {
+                "msg": "A",
+                "rawMsg": "A",
+                "nextStep": [
+                  {
+                    "msg": "B",
+                    "rawMsg": "B",
+                    "nextStep": [
+                      null,
+                      "Point to step 1: LOOP A"
+                    ],
+                    "index": 2,
+                    "type": "IF"
+                  }
+                ],
+                "index": 1,
+                "type": "LOOP"
+              },
+              {
+                "msg": "C",
+                "rawMsg": "C",
+                "nextStep": [
+                  {
+                    "msg": "D",
+                    "rawMsg": "D",
+                    "nextStep": [],
+                    "index": 5,
+                    "type": ""
+                  }
+                ],
+                "index": 4,
+                "type": "ELSE_IF"
+              }
+            ],
+            "index": 0,
+            "type": "IF"
+          }
+        ],
+        "index": {
+          "0": "Point to step 0: IF K",
+          "1": "Point to step 1: LOOP A",
+          "2": "Point to step 2: IF B",
+          "4": "Point to step 4: ELSE_IF C",
+          "5": "Point to step 5: D"
+        },
+        "exitSteps": [
+          "Point to step 1: LOOP A",
+          "Point to step 5: D",
+          "Point to step 4: ELSE_IF C",
+          "Point to step 2: IF B"
+        ]
+      }
+    ];
+    
+    const flows = Slimo.parse(flowText);
+    console.log(toSafeString(flows["sample"]));
+    expect(customDeepEqual(flows["sample"],expected)).toBeTrue();
+  });
 });

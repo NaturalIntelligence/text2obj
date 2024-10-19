@@ -209,7 +209,7 @@ class Parser {
     throw new Error(`No parent ${stepType} found`);
   }
 
-  findNextStepIndexOfLoop(loopIndent){
+  findNextStepIndexOfLoop(targetIndent){
     let i = this.lineIndex; 
     for (; i < this.lines.length;i++) {
       const line = this.lines[i];
@@ -218,7 +218,13 @@ class Parser {
       
       const indentLevel = line.search(/\S/); // Find first non-space character
       if(trimmedLine.startsWith('FLOW:')) return -1;
-      else if (indentLevel <= loopIndent) return i - this.lineIndex;
+      else if (indentLevel <= targetIndent) {
+        if(trimmedLine.startsWith("ELSE")){
+          targetIndent = indentLevel
+        }else{
+          return i - this.lineIndex;
+        }
+      }
     }
     return -1; //file ends
   }
