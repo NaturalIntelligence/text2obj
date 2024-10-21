@@ -6,7 +6,7 @@ function parseAlgorithm(algoText) {
   const lines = algoText.split('\n'); // split and trim lines
 
   let index = {};    // To store the message and type of each step
-  let links = [];    // To store how steps are connected
+  let links = {};    // To store how steps are connected
   let exitSteps = []; // To store the exit points (steps where flow ends)
   let leveledSteps = [[]];
   let indentLevels = [];
@@ -55,7 +55,7 @@ function parseAlgorithm(algoText) {
     let data = readStep(line.trim());
     if(data.index) indexedSteps[data.index] = stepIndex;
     index[stepIndex] = data;
-    links.push([]);
+    links[stepIndex] = [];
 
   });
 
@@ -78,29 +78,50 @@ function  linking(levels, links, index, indexedSteps){
   //for a branch
   //  point to 
   
+  const loopsInScope = [];
   levels.forEach((lvl , lvl_i) => {
     let lastStepType = "";
-    
     lvl.forEach((stepId, i) => {
       const step = index[stepId];
-      
+      loopsInScope[lvl_i]=-1; //reset
       //branch
       if(branchSteps.includes(step.type)){
         //validation
         if(step.type === "ELSE_IF" || step.type === "ELSE" ){
           if(lastStepType !== "IF") throw new Error("Invalid IF..ELSE_IF..ELSE sequence");
-        }else lastStepType = step.type;
-        
+        }else {
+          if(step.type === "LOOP") loopsInScope[lvl_i]=i;
+          lastStepType = step.type;
+        }        
         // IF next level exist
         //  # next step index exist in next level
         // console.log(lvl_i);
         links[stepId].push( (levels[lvl_i+1] && levels[lvl_i+1].includes(stepId + 1))  ? stepId + 1 : -1 );
         // IF next step on same level exist
         links[stepId].push( lvl[i+1] !== undefined ? lvl[i+1] : -1 );
+
       }else if(leavingSteps.includes(step.type)){
+        //last step in links should have 
         if(step.type === "GOTO"){
-          if(indexedSteps[step.msg]) links[stepId] = [indexedSteps[step.msg]];
+          if(indexedSteps[step.msg]) links[stepId - 1][0] = indexedSteps[step.msg];
+          delete links[stepId];
+        }else if(step.type === "SKIP"){
+          //find immediate loop
+          let loop_i= loopsInScope.length-1;
+          for (; loop_i > -1; loop_i--) {
+            const loopStepIndex = loopsInScope[loop_i];
+            if(loopStepIndex === -1) continue;
+            else {
+              links[stepId - 1][0] = loopStepIndex;
+              delete links[stepId];
+              break;
+            }
+          }
+          if(loop_i === -1){
+            throw new Error("SKIP must be used inside a LOOP");
+          }
         }
+
       }
 
       //leaving steps
