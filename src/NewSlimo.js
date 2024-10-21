@@ -78,19 +78,19 @@ function  linking(levels, links, index, indexedSteps){
   //for a branch
   //  point to 
   
-  const loopsInScope = [];
+  const loopSteps = [];
   levels.forEach((lvl , lvl_i) => {
     let lastStepType = "";
     lvl.forEach((stepId, i) => {
       const step = index[stepId];
-      loopsInScope[lvl_i]=-1; //reset
+
       //branch
       if(branchSteps.includes(step.type)){
         //validation
         if(step.type === "ELSE_IF" || step.type === "ELSE" ){
           if(lastStepType !== "IF") throw new Error("Invalid IF..ELSE_IF..ELSE sequence");
         }else {
-          if(step.type === "LOOP") loopsInScope[lvl_i]=i;
+          if(step.type === "LOOP") loopSteps.push(stepId);
           lastStepType = step.type;
         }        
         // IF next level exist
@@ -107,19 +107,16 @@ function  linking(levels, links, index, indexedSteps){
           delete links[stepId];
         }else if(step.type === "SKIP"){
           //find immediate loop
-          let loop_i= loopsInScope.length-1;
-          for (; loop_i > -1; loop_i--) {
-            const loopStepIndex = loopsInScope[loop_i];
-            if(loopStepIndex === -1) continue;
-            else {
-              links[stepId - 1][0] = loopStepIndex;
-              delete links[stepId];
-              break;
+          let loop_i;
+          for (let loop_i= loopSteps.length -1; loop_i > -1; loop_i--) {
+            if(stepId>loopSteps[loop_i]) {
+              links[stepId - 1][0] = loopSteps[loop_i];
             }
           }
           if(loop_i === -1){
             throw new Error("SKIP must be used inside a LOOP");
           }
+          delete links[stepId];
         }
 
       }
@@ -175,17 +172,21 @@ function isSupportedKeyword(k){
 
 // Example usage
 const input = `
-LOOP condition 1
-  [#1] DO A
-  IF condition 2 (extra)
-    GOTO #1
-  ELSE_IF condition 3
-    SKIP
-  ELSE_IF condition 4
-    #comment
-    END
-  this is B
-  last`;
+IF root
+  LOOP condition 1
+    [#1] DO A
+    IF condition 2 (extra)
+      GOTO #1
+    ELSE_IF condition 3
+      SKIP
+    ELSE_IF condition 4
+      #comment
+      END
+    this is B
+    last here
+ELSE_IF admin
+  ban
+last`;
 
 
 const output = parseAlgorithm(input);
