@@ -1,4 +1,4 @@
-const branchSteps = ["IF", "ELSE_IF", "LOOP"];
+const branchSteps = ["IF", "ELSE_IF", "ELSE", "LOOP"];
 const leavingSteps = ["GOTO", "SKIP", "STOP", "END"];
 
 function isBranchStep(step) {
