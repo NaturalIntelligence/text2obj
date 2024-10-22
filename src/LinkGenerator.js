@@ -97,25 +97,23 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
   links[stepId].push(failingBranch); // Failing branch, or undefined
 }
 
-function handleLeavingStep(step, links, loopStack, stepId) {
+function handleLeavingStep(steps, currentStepId, links, loopStack) {
+  const step = steps[currentStepId];
   if (step.type === "SKIP") {
     // SKIP points to the LOOP step
     if (loopStack.length > 0) {
       const loopStepId = loopStack[loopStack.length - 1];
-      links[stepId].push(loopStepId);
+      links[currentStepId].push(loopStepId);
     } else {
       throw new Error("SKIP must be inside LOOP");
     }
   } else if (step.type === "STOP") {
     // STOP points to next step of the LOOP step
-    if (loopStack.length > 0 && loopStack[loopStack.length - 1] + 1 < links.length) {
-      links[stepId].push(loopStack[loopStack.length - 1] + 1);
-    } else {
-      links[stepId].push(undefined);
-    }
+    const nextStepIndex = findNextStep(steps, parentLoop(loopStack));
+    links[currentStepId].push(nextStepIndex);
   } else if (step.type === "END") {
     // END points to -1
-    links[stepId].push(-1);
+    links[currentStepId].push(-1);
   }
 }
 
@@ -152,7 +150,7 @@ function generateLinks(steps, indexedSteps, links) {
     if (isBranchStep(step)) {
       handleBranchStep(step, steps, links, i, loopStack);
     }else if(isLeavingStep(step)){
-      handleLeavingStep(step, links, loopStack, i);
+      handleLeavingStep(steps, i, links, loopStack);
     }else{
       // Normal Step: Just link to the next step if it exists
       handleNormalStep(steps, i, links, loopStack);
