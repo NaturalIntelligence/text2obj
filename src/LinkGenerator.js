@@ -30,7 +30,9 @@ function findSuccessBranch(steps, currentIndex) {
  * Find next step of lower level if not in loop
  * -1 if no next step and not in loop
  * 
- * But if next step is ELSE_IF type, then we need to find next step of this
+ * But if next step is ELSE_IF, ELSE type
+ *  AND current step is IF/ELSE_IF on same indent level
+ * , then we need to find next step of this
  * @param {[number[]]} steps 
  * @param {number} currentStepId 
  * @param {number} indent
@@ -40,7 +42,7 @@ function findNextStep(steps, currentStepId, parentLoopId) {
 
   let nextStepId = -2;
 
-  if(parentLoopId && parentLoopId !== currentStepId){
+  if(parentLoopId && parentLoopId > currentStepId){
     const parentLoop = steps[parentLoopId];
 
     for (let i = currentStepId + 1; i < steps.length; i++) {
@@ -55,14 +57,22 @@ function findNextStep(steps, currentStepId, parentLoopId) {
     for (let i = currentStepId + 1; i < steps.length; i++) {
       if (steps[i].indent <= steps[currentStepId].indent) {
         nextStepId = i;
+        break;
       }
     }
     if(nextStepId === -2) nextStepId = -1;
   }
 
-  // Must not point to ELSE_IF or ELSE
   if(nextStepId > -1 && steps[nextStepId].type.startsWith("ELSE")){
-    nextStepId = findNextStep(steps,nextStepId,parentLoopId);
+    if(steps[currentStepId].indent === steps[nextStepId].indent
+      && (steps[currentStepId].type === "IF" 
+        || steps[currentStepId].type === "ELSE_IF")
+      ){
+      
+    }else{
+      // Must not point to ELSE_IF or ELSE
+      nextStepId = findNextStep(steps,nextStepId,parentLoopId);
+    }
   }
   return nextStepId;
 }
