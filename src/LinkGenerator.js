@@ -99,20 +99,17 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
 
 function handleLeavingStep(steps, currentStepId, links, loopStack) {
   const step = steps[currentStepId];
-  if (step.type === "SKIP") {
-    // SKIP points to the LOOP step
-    if (loopStack.length > 0) {
-      const loopStepId = loopStack[loopStack.length - 1];
-      links[currentStepId].push(loopStepId);
-    } else {
-      throw new Error("SKIP must be inside LOOP");
-    }
-  } else if (step.type === "STOP") {
-    // STOP points to next step of the LOOP step
+  if (step.type === "SKIP") { // points to the LOOP step
+    if (loopStack.length < 1) throw new Error("SKIP must be inside LOOP");
+
+    const loopStepId = loopStack[loopStack.length - 1];
+    links[currentStepId].push(loopStepId);
+  } else if (step.type === "STOP") { // points to next step of the LOOP step
+    if (loopStack.length < 1) throw new Error("STOP must be inside LOOP");
+
     const nextStepIndex = findNextStep(steps, parentLoop(loopStack));
     links[currentStepId].push(nextStepIndex);
-  } else if (step.type === "END") {
-    // END points to -1
+  } else if (step.type === "END")  { // points to -1
     links[currentStepId].push(-1);
   }
 }

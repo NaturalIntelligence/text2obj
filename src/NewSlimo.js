@@ -1,3 +1,5 @@
+const generateLinks = require("./LinkGenerator");
+
 const branchSteps = ["IF", "ELSE_IF", "LOOP"];
 const leavingSteps = ["GOTO", "SKIP", "STOP", "END"];
 const normalSteps = ["AND", "THEN", "BUT", "FOLLOW", "ERR"];
@@ -5,7 +7,7 @@ const normalSteps = ["AND", "THEN", "BUT", "FOLLOW", "ERR"];
 function parseAlgorithm(algoText) {
   const lines = algoText.split('\n'); // split and trim lines
 
-  let index = {};    // To store the message and type of each step
+  let steps = [];    // To store the message and type of each step
   let links = {};    // To store how steps are connected
   let exitSteps = []; // To store the exit points (steps where flow ends)
   let leveledSteps = [[]];
@@ -33,14 +35,14 @@ function parseAlgorithm(algoText) {
     }
     if(curIndentVal === indent){ //same level
       leveledSteps[curIndentLvl].push(stepIndex);
-    }else if(curIndentVal < indent){
+    }else if(curIndentVal < indent){ // next level
       indentLevels[++curIndentLvl] = indent;
       if(leveledSteps[curIndentLvl]){
         leveledSteps[curIndentLvl].push(stepIndex);
       }else{
         leveledSteps.push([stepIndex]);
       }
-    }else{
+    }else{ //previous level
       for(;curIndentLvl > -1; curIndentLvl--){
         let lastIndentLvl = indentLevels[curIndentLvl];
         if(lastIndentLvl === indent) break;
@@ -53,85 +55,23 @@ function parseAlgorithm(algoText) {
     }
 
     let data = readStep(line.trim());
+    data.indent = curIndentLvl;
     if(data.index) indexedSteps[data.index] = stepIndex;
-    index[stepIndex] = data;
+    // steps[stepIndex] = data;
+    steps.push(data);
     links[stepIndex] = [];
 
   });
 
   
   console.log(leveledSteps);
-  // console.log(indexedSteps);
-  linking(leveledSteps, links, index, indexedSteps);
-  return { index, links, exitSteps };
-}
-
-
-
-/**
- * 
- * @param {[number[]]} levels 
- * @param {object} index 
- */
-function  linking(levels, links, index, indexedSteps){
-  //FLOW: linking
-  //for a branch
-  //  point to 
+  console.log(steps);
+  generateLinks(steps, indexedSteps, links);
   
-  const loopSteps = [];
-  levels.forEach((lvl , lvl_i) => {
-    let lastStepType = "";
-    lvl.forEach((stepId, i) => {
-      const step = index[stepId];
-
-      //branch
-      if(branchSteps.includes(step.type)){
-        //validation
-        if(step.type === "ELSE_IF" || step.type === "ELSE" ){
-          if(lastStepType !== "IF") throw new Error("Invalid IF..ELSE_IF..ELSE sequence");
-        }else {
-          if(step.type === "LOOP") loopSteps.push(stepId);
-          lastStepType = step.type;
-        }        
-        // IF next level exist
-        //  # next step index exist in next level
-        // console.log(lvl_i);
-        links[stepId].push( (levels[lvl_i+1] && levels[lvl_i+1].includes(stepId + 1))  ? stepId + 1 : -1 );
-        // IF next step on same level exist
-        links[stepId].push( lvl[i+1] !== undefined ? lvl[i+1] : -1 );
-
-      }else if(leavingSteps.includes(step.type)){
-        //last step in links should have 
-        if(step.type === "GOTO"){
-          if(indexedSteps[step.msg]) links[stepId - 1][0] = indexedSteps[step.msg];
-          delete links[stepId];
-        }else if(step.type === "SKIP"){
-          //find immediate loop
-          let loop_i;
-          for (let loop_i= loopSteps.length -1; loop_i > -1; loop_i--) {
-            if(stepId>loopSteps[loop_i]) {
-              links[stepId - 1][0] = loopSteps[loop_i];
-            }
-          }
-          if(loop_i === -1){
-            throw new Error("SKIP must be used inside a LOOP");
-          }
-          delete links[stepId];
-        }
-
-      }
-
-      //leaving steps
-    })
-
-
-  });
-
-  //leaving step
-
-
-  console.log(links)
+  console.log(links);
+  return { index: steps, links, exitSteps };
 }
+
 
 function readStep(statement) {
   const data = { msg:"", rawMsg: "", type: ""}
@@ -180,8 +120,11 @@ IF root
     ELSE_IF condition 3
       SKIP
     ELSE_IF condition 4
-      #comment
-      END
+      LOOP illusion
+        ends here
+      STOP
+      IF otherwise
+        END
     this is B
     last here
 ELSE_IF admin
@@ -190,4 +133,6 @@ last`;
 
 
 const output = parseAlgorithm(input);
-console.log(JSON.stringify(output, null, 2));
+// console.log(JSON.stringify(output, null, 2));
+
+
