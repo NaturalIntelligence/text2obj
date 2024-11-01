@@ -8,11 +8,7 @@ function isLeavingStep(step) {
   return leavingSteps.includes(step.type);
 }
 
-function handleGotoStep(step, indexedSteps, links, stepId) {
-  if (indexedSteps[step.msg]) {
-    links[stepId].push(indexedSteps[step.msg]);
-  }
-}
+
 
 function findSuccessBranch(steps, currentIndex) {
   for (let i = currentIndex + 1; i < steps.length; i++) {
@@ -97,21 +93,42 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
   links[stepId].push(failingBranch); // Failing branch, or undefined
 }
 
+function handleGotoStep(step, indexedSteps, links, stepId) {
+  if(stepId === 0) throw new Error("GOTO can't be first step of the  flow");
+  if(indexedSteps[step.msg] === undefined) throw new Error("GOTO is pointing to step.msg that doesn't specified with any step")
+
+  //validate target step
+  updateInLastStep(links,stepId,indexedSteps[step.msg]);
+}
+
 function handleLeavingStep(steps, currentStepId, links, loopStack) {
   const step = steps[currentStepId];
   if (step.type === "SKIP") { // points to the LOOP step
     if (loopStack.length < 1) throw new Error("SKIP must be inside LOOP");
 
     const loopStepId = loopStack[loopStack.length - 1];
-    links[currentStepId].push(loopStepId);
+    updateInLastStep(links, currentStepId, loopStepId);
   } else if (step.type === "STOP") { // points to next step of the LOOP step
     if (loopStack.length < 1) throw new Error("STOP must be inside LOOP");
 
     const nextStepIndex = findNextStep(steps, parentLoop(loopStack));
-    links[currentStepId].push(nextStepIndex);
+    updateInLastStep(links, currentStepId, nextStepIndex);
   } else if (step.type === "END")  { // points to -1
-    links[currentStepId].push(-1);
+    updateInLastStep(links, currentStepId, -1);
   }
+}
+
+/**
+ * Skip an extra link for leaving steps
+ * @param {object} links 
+ * @param {number} parentStepId 
+ * @param {number} currentStepId 
+ */
+function updateInLastStep(links, currentStepId, stepToPoint){
+  const parentStepId = currentStepId - 1;
+  const ind = links[parentStepId].indexOf(currentStepId);
+  links[parentStepId][ind] = stepToPoint;
+  delete links[currentStepId];
 }
 
 function manageLoopStack(step, loopStack, indent, stepId, steps) {
