@@ -1,8 +1,10 @@
 const generateLinks = require("./LinkGenerator");
 
-const branchSteps = ["IF", "ELSE_IF", "LOOP"];
+const branchSteps = ["IF", "ELSE_IF", "LOOP", "ELSE"];
 const leavingSteps = ["GOTO", "SKIP", "STOP", "END"];
 const normalSteps = ["AND", "THEN", "BUT", "FOLLOW", "ERR"];
+
+
 
 function parseAlgorithm(algoText) {
   const lines = algoText.split('\n'); // split and trim lines
@@ -17,8 +19,7 @@ function parseAlgorithm(algoText) {
   let indexedSteps = {};
   //TODO: 
   // - break on FLOW:
-  // - ignore comments
-  // - step id for GOTO
+  
   lines.forEach((line, i) => {
     const trimmedLine = line.trim();
     if (!trimmedLine || trimmedLine[0] === "#") return; // Skip empty or comment lines
@@ -73,6 +74,16 @@ function parseAlgorithm(algoText) {
 }
 
 
+/**
+ * Sample: [#1] ERR This statement (extra info)
+ * @param {string} statement 
+ * @returns {{msg:string, rawMsg: string, type:string, index:string, indent:number}}
+    {msg: 'This statement',
+    rawMsg: 'This statement (extra info)',
+    type: 'ERR',
+    index: '#1',
+    indent: 0}
+ */
 function readStep(statement) {
   const data = { msg:"", rawMsg: "", type: ""}
   if(statement[0] === '[') {//has index
@@ -100,6 +111,11 @@ function readStep(statement) {
   return data;
 }
 
+/**
+ * Remove extra  info from the message
+ * @param {string} msg 
+ * @returns {string}
+ */
 function refinedMsg(msg){
   return msg.replace(/\([^)]*\)/g, '').replace(/\s\s/g,' ');
 }
@@ -111,7 +127,7 @@ function isSupportedKeyword(k){
 }
 
 // Example usage
-const input = `
+let input = `
 IF root
   LOOP condition 1
     [#1] DO A
@@ -122,14 +138,20 @@ IF root
     ELSE_IF condition 4
       LOOP illusion
         ends here
-      STOP
       IF otherwise
         END
+      ELSE
+        STOP
     this is B
+    FOLLOW a new flow
     last here
+    #comments are skipped
 ELSE_IF admin
   ban
 last`;
+input = `
+[index] ERR This statement (extra info)
+`;
 
 
 const output = parseAlgorithm(input);
