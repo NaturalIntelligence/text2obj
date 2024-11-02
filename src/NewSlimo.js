@@ -9,17 +9,17 @@ const normalSteps = ["AND", "THEN", "BUT", "FOLLOW", "ERR"];
 function parseAlgorithm(algoText) {
   const lines = algoText.split('\n'); // split and trim lines
 
-  let steps = [];    // To store the message and type of each step
-  let links = {};    // To store how steps are connected
-  let exitSteps = []; // To store the exit points (steps where flow ends)
-  let leveledSteps = [[]];
-  let indentLevels = [];
-  let curIndentLvl = 0;
-  let stepIndex = -1;
-  let indexedSteps = {};
+  let steps = [];    // Store step detail
+  let links = {};    // Store links for a step
+  let indexedSteps = {}; //used for GOTO statement
+  let leveledSteps = [[]]; // store steps indentation wise
+  let indentLevels = []; //temp to hold indent detail
+  let curIndentLvl = 0;  //temp to hold current indent detail
+  let stepIndex = -1;    //temp
+
   //TODO: 
   // - break on FLOW:
-  
+
   lines.forEach((line, i) => {
     const trimmedLine = line.trim();
     if (!trimmedLine || trimmedLine[0] === "#") return; // Skip empty or comment lines
@@ -65,12 +65,11 @@ function parseAlgorithm(algoText) {
   });
 
   
-  console.log(leveledSteps);
-  console.log(steps);
   generateLinks(steps, indexedSteps, links);
-  
-  console.log(links);
-  return { index: steps, links, exitSteps };
+  // console.log(leveledSteps);
+  // console.log(steps);
+  // console.log(links);
+  return { index: steps, links };
 }
 
 
