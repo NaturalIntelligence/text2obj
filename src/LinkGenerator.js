@@ -129,7 +129,7 @@ function handleGotoStep(steps, step, indexedSteps, links, stepId) {
   if(indexedSteps[step.msg] === undefined) throw new Error("GOTO is pointing to step.msg that doesn't specified with any step")
 
   //validate target step
-  updateInLastStep(steps, links,stepId,indexedSteps[step.msg]);
+  updatePointersOfLastSteps(steps, links,stepId,indexedSteps[step.msg]);
 }
 
 function handleLeavingStep(steps, currentStepId, links, loopStack) {
@@ -139,30 +139,36 @@ function handleLeavingStep(steps, currentStepId, links, loopStack) {
     if (loopStack.length < 1) throw new Error("SKIP must be inside LOOP");
 
     const loopStepId = loopStack[loopStack.length - 1];
-    updateInLastStep(steps, links, currentStepId, loopStepId);
+    updatePointersOfLastSteps(steps, links, currentStepId, loopStepId);
   } else if (step.type === "STOP") { // points to next step of the LOOP step
     if (loopStack.length < 1) throw new Error("STOP must be inside LOOP");
 
     const nextStepIndex = findNextStep(steps, parentLoop(loopStack));
-    updateInLastStep(steps, links, currentStepId, nextStepIndex);
+    updatePointersOfLastSteps(steps, links, currentStepId, nextStepIndex);
   } else if (step.type === "END")  { // points to -1
-    updateInLastStep(steps, links, currentStepId, -1);
+    updatePointersOfLastSteps(steps, links, currentStepId, -1);
   }
 }
 
 /**
- * Skip an extra link for leaving steps
+ * Skip an extra link for leaving steps. Update pointer in all previous steps pointing to this
  * @param {object} links 
  * @param {number} parentStepId 
  * @param {number} currentStepId 
  */
-function updateInLastStep(steps, links, currentStepId, stepToPoint){
-  let parentStepId = currentStepId - 1;
-  if(steps[parentStepId].type === "ELSE"){
-    parentStepId = findLastStepOfSameLevel(steps, parentStepId);
+function updatePointersOfLastSteps(steps, links, currentStepId, stepToPoint){
+  for (let i = 0; i < currentStepId; i++) {
+    let link = links[i];
+    if(link !== undefined){
+      const ind = link.indexOf(currentStepId);
+      if(ind !== -1){
+        if(steps[i].type === "ELSE"){
+          link = findLastStepOfSameLevel(steps, link);
+        }
+        link[ind] = stepToPoint;
+      }
+    }
   }
-  const ind = links[parentStepId].indexOf(currentStepId);
-  links[parentStepId][ind] = stepToPoint;
   delete links[currentStepId];
 }
 
