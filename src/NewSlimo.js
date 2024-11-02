@@ -4,25 +4,50 @@ const branchSteps = ["IF", "ELSE_IF", "LOOP", "ELSE"];
 const leavingSteps = ["GOTO", "SKIP", "STOP", "END"];
 const normalSteps = ["AND", "THEN", "BUT", "FOLLOW", "ERR"];
 
-
+class Flow {
+  constructor(name) {
+    this.name = name;
+    this.headers = {};
+    this.steps = []; // Store step detail
+    this.links = {}; // Store links for a step
+    this.leveledSteps = [[]]; // store steps indentation wise
+    // this.index = {};
+    // this.exitSteps = [];
+  }
+}
 
 function parseAlgorithm(algoText) {
   const lines = algoText.split('\n'); // split and trim lines
+  const flows = [];
 
-  let steps = [];    // Store step detail
-  let links = {};    // Store links for a step
   let indexedSteps = {}; //used for GOTO statement
-  let leveledSteps = [[]]; // store steps indentation wise
   let indentLevels = []; //temp to hold indent detail
   let curIndentLvl = 0;  //temp to hold current indent detail
   let stepIndex = -1;    //temp
-
+  let currentFlow = null;
+  let readingHeader = false;
   //TODO: 
-  // - break on FLOW:
+  // - read Flow headers
 
   lines.forEach((line, i) => {
     const trimmedLine = line.trim();
     if (!trimmedLine || trimmedLine[0] === "#") return; // Skip empty or comment lines
+    else if (trimmedLine.startsWith("FLOW:")){
+      // complete last flow and start new
+      if(currentFlow) generateLinks(currentFlow.steps, indexedSteps, currentFlow.links);
+      indexedSteps = {}; //reset
+      indentLevels = [];
+      curIndentLvl  = 0;
+      stepIndex = -1
+      currentFlow = new Flow(trimmedLine);
+      flows.push(currentFlow);
+      readingHeader = true;
+    }else if(readingHeader && line.match(/^[a-z]{1,70}:/)) {//reading header
+      const [key, value] = line.split(':');
+      currentFlow.headers[key.trim()] = value.trim();
+    }else{
+      readingHeader = false;
+    }
 
     stepIndex++;
 
@@ -35,13 +60,13 @@ function parseAlgorithm(algoText) {
       indentLevels[curIndentLvl] = indent;
     }
     if(curIndentVal === indent){ //same level
-      leveledSteps[curIndentLvl].push(stepIndex);
+      currentFlow.leveledSteps[curIndentLvl].push(stepIndex);
     }else if(curIndentVal < indent){ // next level
       indentLevels[++curIndentLvl] = indent;
-      if(leveledSteps[curIndentLvl]){
-        leveledSteps[curIndentLvl].push(stepIndex);
+      if(currentFlow.leveledSteps[curIndentLvl]){
+        currentFlow.leveledSteps[curIndentLvl].push(stepIndex);
       }else{
-        leveledSteps.push([stepIndex]);
+        currentFlow.leveledSteps.push([stepIndex]);
       }
     }else{ //previous level
       for(;curIndentLvl > -1; curIndentLvl--){
@@ -51,25 +76,21 @@ function parseAlgorithm(algoText) {
       if(curIndentLvl === -1){
         throw new Error(`Indentation issue with line |${line}|`);
       }else{
-        leveledSteps[curIndentLvl].push(stepIndex);
+        currentFlow.leveledSteps[curIndentLvl].push(stepIndex);
       }
     }
 
     let data = readStep(line.trim());
     data.indent = curIndentLvl;
     if(data.index) indexedSteps[data.index] = stepIndex;
-    // steps[stepIndex] = data;
-    steps.push(data);
-    links[stepIndex] = [];
+    currentFlow.steps.push(data);
+    currentFlow.links[stepIndex] = [];
 
   });
 
   
-  generateLinks(steps, indexedSteps, links);
-  // console.log(leveledSteps);
-  // console.log(steps);
-  // console.log(links);
-  return { index: steps, links };
+  generateLinks(currentFlow.steps, indexedSteps, currentFlow.links); //for last flow
+  return flows;
 }
 
 
@@ -110,6 +131,7 @@ function readStep(statement) {
   return data;
 }
 
+
 /**
  * Remove extra  info from the message
  * @param {string} msg 
@@ -149,11 +171,16 @@ ELSE_IF admin
   ban
 last`;
 input = `
+FLOW: sample
+[index] ERR This statement (extra info)
+
+FLOW: sample
+this: is header
 [index] ERR This statement (extra info)
 `;
 
 
 const output = parseAlgorithm(input);
-// console.log(JSON.stringify(output, null, 2));
+console.log(JSON.stringify(output, null, 2));
 
 
