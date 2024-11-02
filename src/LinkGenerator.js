@@ -118,8 +118,12 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
   }
 }
 
+function checkIfNot1stStep(steps, id){
+  if(id === 0) throw new Error(`${steps[id].type} can't be first step of the flow`);
+}
+
 function handleGotoStep(steps, step, indexedSteps, links, stepId) {
-  if(stepId === 0) throw new Error("GOTO can't be first step of the  flow");
+  checkIfNot1stStep(steps, stepId);
   if(indexedSteps[step.msg] === undefined) throw new Error("GOTO is pointing to step.msg that doesn't specified with any step")
 
   //validate target step
@@ -127,6 +131,7 @@ function handleGotoStep(steps, step, indexedSteps, links, stepId) {
 }
 
 function handleLeavingStep(steps, currentStepId, links, loopStack) {
+  checkIfNot1stStep(steps, currentStepId);
   const step = steps[currentStepId];
   if (step.type === "SKIP") { // points to the LOOP step
     if (loopStack.length < 1) throw new Error("SKIP must be inside LOOP");
