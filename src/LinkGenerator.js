@@ -10,6 +10,7 @@ function isLeavingStep(step) {
 
 
 /**
+ * A next step is not a child step but a sibling or higher level step
  * Find next step of same level or
  * Find next step of lower level within loop boundary if within loop
  * loop step if no next step of lower level within loop boundary if within loop
@@ -25,16 +26,28 @@ function isLeavingStep(step) {
  * @returns {number} step id
  */
 function findNextStep(steps, currentStepId, parentLoopId) {
-
   let nextStepId = -2;
 
-  if(parentLoopId && parentLoopId > currentStepId){
-    const parentLoop = steps[parentLoopId];
+  // if(parentLoopId !== undefined && parentLoopId > currentStepId){
+  if(parentLoopId !== undefined){
+    // Find next step whose indent is less or equal to current indent
+    // but higher than loop's indent
+    // Otherwise IF next step indent is higher, ignore
+    // IF next step indent is higher or equal to loop indent, point to loop
 
-    for (let i = currentStepId + 1; i < steps.length; i++) {
-      if (steps[i].indent <= steps[currentStepId].indent &&
-          steps[i].indent > parentLoop.indent) {
+    const parentLoop = steps[parentLoopId];
+    const currentIndent = steps[currentStepId].indent;
+    for (let i = currentStepId+1; i < steps.length; i++) {
+      const nextStepIndent = steps[i].indent;
+      if (nextStepIndent === currentIndent){
         nextStepId = i;
+        break;
+      }else if (nextStepIndent < currentIndent){
+        if(nextStepIndent > parentLoop.indent) {
+          nextStepId = i;
+        }else{
+          nextStepId = parentLoopId
+        }
         break;
       }
     }
@@ -54,7 +67,7 @@ function findNextStep(steps, currentStepId, parentLoopId) {
       && (steps[currentStepId].type === "IF" 
         || steps[currentStepId].type === "ELSE_IF")
       ){
-      
+      // do nothing
     }else{
       // Must not point to ELSE_IF or ELSE
       nextStepId = findNextStep(steps,nextStepId,parentLoopId);
@@ -98,6 +111,10 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
     links[stepId].push(failingBranchStepId+1);
   }else{
     links[stepId].push(failingBranchStepId);
+  }
+
+  if (step.type === "LOOP") {
+    loopStack.push(stepId); // Push LOOP to the stack
   }
 }
 
@@ -144,19 +161,6 @@ function updateInLastStep(steps, links, currentStepId, stepToPoint){
   delete links[currentStepId];
 }
 
-function manageLoopStack(step, loopStack, indent, stepId, steps) {
-  if (step.type === "LOOP") {
-    loopStack.push(stepId); // Push LOOP to the stack
-  }
-
-  // Pop from stack if current indent is less than or equal to the last LOOP indent
-  if (loopStack.length > 0 ) {
-    const loopStepId = loopStack[loopStack.length - 1];
-    if(stepId > loopStepId && indent <= steps[loopStepId].indent)
-      loopStack.pop();
-  }
-}
-
 function generateLinks(steps, indexedSteps, links) {
   const loopStack = []; // Stack to track LOOP steps
 
@@ -165,7 +169,14 @@ function generateLinks(steps, indexedSteps, links) {
     const step = steps[i];
     const indent = step.indent;
 
-    manageLoopStack(step, loopStack, indent, i, steps);
+    if (loopStack.length > 0 ) {
+      //pop until loop indent is equal to current  step indent
+      for (let li = loopStack.length - 1; li > -1; li--) {
+        const loopStepId = loopStack[li];
+        if(indent <= steps[loopStepId].indent)
+          loopStack.pop();
+      }
+    }
 
     if (step.type === "GOTO") {
       handleGotoStep(steps, step, indexedSteps, links, i);
@@ -177,6 +188,8 @@ function generateLinks(steps, indexedSteps, links) {
     }else{  // Normal Step: Just link to the next step if exists
       handleNormalStep(steps, i, links, loopStack);
     }
+
+    
   }
 }
 
