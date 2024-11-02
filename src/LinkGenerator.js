@@ -107,10 +107,12 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
 
   // Find next step with same or lower indent
   let failingBranchStepId = findNextStep(steps, stepId, parentLoop(loopStack));
-  if(steps[failingBranchStepId].type === "ELSE"){ //point to it's child step if exist
-    links[stepId].push(failingBranchStepId+1);
-  }else{
-    links[stepId].push(failingBranchStepId);
+  if(failingBranchStepId !== -1 ){
+    if(steps[failingBranchStepId].type === "ELSE"){ //point to it's child step if exist
+      links[stepId].push(failingBranchStepId+1);
+    }else{
+      links[stepId].push(failingBranchStepId);
+    }
   }
 
   if (step.type === "LOOP") {
@@ -142,7 +144,6 @@ function handleLeavingStep(steps, currentStepId, links, loopStack) {
     if (loopStack.length < 1) throw new Error("STOP must be inside LOOP");
 
     const nextStepIndex = findNextStep(steps, parentLoop(loopStack));
-    console.log(currentStepId, nextStepIndex);
     updateInLastStep(steps, links, currentStepId, nextStepIndex);
   } else if (step.type === "END")  { // points to -1
     updateInLastStep(steps, links, currentStepId, -1);
@@ -159,7 +160,6 @@ function updateInLastStep(steps, links, currentStepId, stepToPoint){
   let parentStepId = currentStepId - 1;
   if(steps[parentStepId].type === "ELSE"){
     parentStepId = findLastStepOfSameLevel(steps, parentStepId);
-    console.log(parentStepId);
   }
   const ind = links[parentStepId].indexOf(currentStepId);
   links[parentStepId][ind] = stepToPoint;
