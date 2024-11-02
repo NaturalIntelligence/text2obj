@@ -83,7 +83,7 @@ function handleNormalStep(steps, stepId, links, loopStack) {
 
 function findLastStepOfSameLevel(steps, stepId){
   const targetLvl = steps[stepId].indent;
-  for (let i = stepId-1; i > 0; i--) {
+  for (let i = stepId-1; i > -1; i--) {
     if(targetLvl === steps[i].indent){
       return i; 
     }
