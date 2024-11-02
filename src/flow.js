@@ -16,7 +16,7 @@ class Flow {
   }
 }
 
-function parseAlgorithm(algoText) {
+function parse(algoText) {
   const lines = algoText.split('\n'); // split and trim lines
   const flows = [];
 
@@ -42,9 +42,11 @@ function parseAlgorithm(algoText) {
       currentFlow = new Flow(trimmedLine);
       flows.push(currentFlow);
       readingHeader = true;
-    }else if(readingHeader && line.match(/^[a-z]{1,70}:/)) {//reading header
+      return;
+    }else if(readingHeader && trimmedLine.match(/^[a-z]{1,70}:/)) {//reading header
       const [key, value] = line.split(':');
       currentFlow.headers[key.trim()] = value.trim();
+      return;
     }else{
       readingHeader = false;
     }
@@ -148,39 +150,40 @@ function isSupportedKeyword(k){
 }
 
 // Example usage
-let input = `
-IF root
-  LOOP condition 1
-    [#1] DO A
-    IF condition 2 (extra)
-      GOTO #1
-    ELSE_IF condition 3
-      SKIP
-    ELSE_IF condition 4
-      LOOP illusion
-        ends here
-      IF otherwise
-        END
-      ELSE
-        STOP
-    this is B
-    FOLLOW a new flow
-    last here
-    #comments are skipped
-ELSE_IF admin
-  ban
-last`;
-input = `
-FLOW: sample
-[index] ERR This statement (extra info)
+// let input = `
+// IF root
+//   LOOP condition 1
+//     [#1] DO A
+//     IF condition 2 (extra)
+//       GOTO #1
+//     ELSE_IF condition 3
+//       SKIP
+//     ELSE_IF condition 4
+//       LOOP illusion
+//         ends here
+//       IF otherwise
+//         END
+//       ELSE
+//         STOP
+//     this is B
+//     FOLLOW a new flow
+//     last here
+//     #comments are skipped
+// ELSE_IF admin
+//   ban
+// last`;
+// input = `
+// FLOW: sample
+// [index] ERR This statement (extra info)
 
-FLOW: sample
-this: is header
-[index] ERR This statement (extra info)
-`;
-
-
-const output = parseAlgorithm(input);
-console.log(JSON.stringify(output, null, 2));
+// FLOW: sample
+// this: is header
+// [index] ERR This statement (extra info)
+// `;
 
 
+// const output = parse(input);
+// console.log(JSON.stringify(output, null, 2));
+
+
+module.exports = parse;
