@@ -1,31 +1,21 @@
-const parse = require("../flow/flow/flow"); 
+const parse = require("../flow"); 
 const {customDeepEqual, toSafeString} = require("../../../tests/util"); 
 
 describe("Flow Parser: LOOP", function() {
   it("should parse flow with loop", function() {
     const flowText = `
-FLOW: Sample flow 1
-version:  1.0
-threshold: 6000
-LOOP (source is) readable
-  THEN read a character (of input buffer)
-  IF statement 
-    IF another statement
-      THEN found here
-      AND copy data
-    ELSE_IF parallel statement
-      DO nothing
-      ERR Unexpected end of input
-      END
-    ELSE last statement
-  ELSE something
-  IF optional
-DO in end
+FLOW: passed as parameter
+IF not
+  but
+ELSE_IF else if
+  B
+ELSE
+  A
 `;
 
     
     const flows = parse(flowText);
-    console.log(toSafeString(flows));
+    console.log(flows[0].links);
     // expect(customDeepEqual(flows["Sample flow 1"][0],expected)).toBeTrue();
   });
 });

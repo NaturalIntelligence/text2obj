@@ -1,4 +1,4 @@
-const parse = require("../../flow/flow"); 
+const parse = require("../flow"); 
 const {customDeepEqual,toSafeString} = require("../../../tests/util"); 
 
 describe("Flow Parser", function() {
