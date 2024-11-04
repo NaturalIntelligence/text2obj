@@ -107,13 +107,10 @@ function handleBranchStep(step, steps, links, stepId, loopStack) {
 
   // Find next step with same or lower indent
   let failingBranchStepId = findNextStep(steps, stepId, parentLoop(loopStack));
-  if(failingBranchStepId !== -1 ){
-    if(steps[failingBranchStepId].type === "ELSE"){ //point to it's child step if exist
-      links[stepId].push(failingBranchStepId+1);
-    }else{
-      links[stepId].push(failingBranchStepId);
-    }
+  if(failingBranchStepId !== -1 && steps[failingBranchStepId].type === "ELSE"){
+    failingBranchStepId++;
   }
+  links[stepId].push(failingBranchStepId);
 
   if (step.type === "LOOP") {
     loopStack.push(stepId); // Push LOOP to the stack
@@ -126,7 +123,7 @@ function checkIfNot1stStep(steps, id){
 
 function handleGotoStep(steps, step, indexedSteps, links, stepId) {
   checkIfNot1stStep(steps, stepId);
-  if(indexedSteps[step.msg] === undefined) throw new Error("GOTO is pointing to step.msg that doesn't specified with any step")
+  if(indexedSteps[step.msg] === undefined) throw new Error(`GOTO is pointing to ${step.msg} that doesn't specified with any step`)
 
   //validate target step
   updatePointersOfLastSteps(steps, links,stepId,indexedSteps[step.msg]);

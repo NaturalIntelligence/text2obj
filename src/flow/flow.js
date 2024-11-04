@@ -39,7 +39,7 @@ function parse(algoText) {
       indentLevels = [];
       curIndentLvl  = 0;
       stepIndex = -1
-      currentFlow = new Flow(trimmedLine);
+      currentFlow = new Flow(trimmedLine.substring(6));
       flows.push(currentFlow);
       readingHeader = true;
       return;

@@ -1,4 +1,4 @@
-const Slimo = require("../src/Slimo"); 
+const parse = require("../src/flow/flow"); 
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
@@ -9,7 +9,6 @@ describe("Flow Parser", function() {
 
         FLOW: Sample flow 1
         version: 1.0
-        threshold: 5000
         LOOP condition 1
           DO A
           IF condition 2
@@ -17,98 +16,44 @@ describe("Flow Parser", function() {
           DO B
         DO C`;
 
-    const expected = {
-        "Addition": [{
-          "name": "Addition",
-          "headers": {},
-          "steps": [
-            {
-              "msg": "Add both values",
-              "rawMsg": "Add both values",
-              "nextStep": [],
-              "index": 0,
-              "type": ""
-            }
-          ],
-          "index": {
-            "0": "Point to step 0: Add both values"
-          },
-          "exitSteps": [
-            "Point to step 0: Add both values"
-          ]
-        }],
-        "Sample flow 1": [{
-          "name": "Sample flow 1",
-          "headers": {
-            "version": 1,
-            "threshold": 5000
-          },
-          "steps": [
-            {
-              "msg": "condition 1",
-              "rawMsg": "condition 1",
-              "nextStep": [
-                {
-                  "msg": "DO A",
-                  "rawMsg": "DO A",
-                  "nextStep": [
-                    {
-                      "msg": "condition 2",
-                      "rawMsg": "condition 2",
-                      "nextStep": [
-                        {
-                          "msg": "Addition",
-                          "rawMsg": "Addition",
-                          "nextStep": [
-                            {
-                              "msg": "DO B",
-                              "rawMsg": "DO B",
-                              "nextStep": [
-                                "Point to step 0: LOOP condition 1"
-                              ],
-                              "index": 4,
-                              "type": ""
-                            }
-                          ],
-                          "index": 3,
-                          "type": "FOLLOW"
-                        },
-                        "Point to step 4: DO B"
-                      ],
-                      "index": 2,
-                      "type": "IF"
-                    }
-                  ],
-                  "index": 1,
-                  "type": ""
-                },
-                {
-                  "msg": "DO C",
-                  "rawMsg": "DO C",
-                  "nextStep": [],
-                  "index": 5,
-                  "type": ""
-                }
-              ],
-              "index": 0,
-              "type": "LOOP"
-            }
-          ],
-          "index": {
-            "0": "Point to step 0: LOOP condition 1",
-            "1": "Point to step 1: DO A",
-            "2": "Point to step 2: IF condition 2",
-            "3": "Point to step 3: FOLLOW Addition",
-            "4": "Point to step 4: DO B",
-            "5": "Point to step 5: DO C"
-          },
-          "exitSteps": [
-            "Point to step 5: DO C"
-          ]
-        }]
-      };
+    const expected = [
+      {
+        "name": "Addition",
+        "headers": {},
+        "steps": [
+          {"msg": "Add both values","rawMsg": "Add both values","type": "","indent": 0 }
+        ],
+        "links": {
+          "0": [-1 ]
+        },
+        "leveledSteps": [[0]]
+      },
+      {
+        "name": "Sample flow 1",
+        "headers": {
+          "version": "1.0"
+        },
+        "steps": [
+          { "msg": "condition 1", "rawMsg": "condition 1", "type": "LOOP", "indent": 0  },
+          { "msg": "DO A", "rawMsg": "DO A", "type": "", "indent": 1  },
+          { "msg": "condition 2", "rawMsg": "condition 2", "type": "IF", "indent": 1  },
+          { "msg": "Addition", "rawMsg": "Addition", "type": "FOLLOW", "indent": 2  },
+          { "msg": "DO B", "rawMsg": "DO B", "type": "", "indent": 1  },
+          { "msg": "DO C", "rawMsg": "DO C", "type": "", "indent": 0  }
+        ],
+        "links": {
+          "0": [ 1, 5 ],
+          "1": [ 2 ],
+          "2": [ 3, 4 ],
+          "3": [ 4 ],
+          "4": [ 0 ],
+          "5": [-1 ]
+        },
+        "leveledSteps": [[0,5],[1,2,4],[3]]
+      }
+    ];
     
-    const flows = Slimo.parse(flowText);
+    const flows = parse(flowText);
     // console.log(toSafeString(flows));
     expect(customDeepEqual(flows,expected)).toBeTrue();
   });

@@ -1,7 +1,31 @@
-const Slimo = require("../src/Slimo"); 
+const parse = require("../src/flow/flow"); 
 const {customDeepEqual,toSafeString} = require("./util"); 
 
 describe("Flow Parser", function() {
+    it("should parse flow with no statement", function() {
+        const flowText = `
+            FLOW: Sample flow 1
+            version: 1.0
+            threshold: 5000`;
+        const expected = [
+            {
+                "name": "Sample flow 1",
+                "headers": {
+                    "version": "1.0",
+                    "threshold": "5000"
+                },
+                "steps": [],
+                "links": {},
+                "leveledSteps": [
+                    []
+                ]
+            }
+        ];
+        
+        const flows = parse(flowText);
+        // console.log(JSON.stringify(flows, null, 4));
+        expect(customDeepEqual(flows,expected)).toBeTrue();
+    });
   it("should parse duplicate flows", function() {
     const flowText = `
         FLOW: Sample flow
@@ -21,56 +45,39 @@ describe("Flow Parser", function() {
       {
         "name": "Sample flow",
         "headers": {
-          "version": 1,
-          "threshold": 5000
+            "version": "1.0",
+            "threshold": "5000"
         },
         "steps": [
-          {
-            "msg": "DO A",
-            "rawMsg": "DO A",
-            "nextStep": [
-              null
-            ],
-            "index": 0,
-            "type": ""
-          }
+            { "msg": "DO A","rawMsg": "DO A","type": ""   ,"indent": 0 },
+            { "msg": ""    ,"rawMsg": ""    ,"type": "END","indent": 0 }
         ],
-        "index": {
-          "0": "Point to step 0: DO A"
+        "links": {
+            "0": [-1]
         },
-        "exitSteps": [
-          "Point to step 0: DO A"
-        ]
+        "leveledSteps": [ [0,1] ]
       },
       {
-        "name": "Sample flow",
-        "headers": {
-          "version": 2,
-          "threshold": 5000
-        },
-        "steps": [
-          {
-            "msg": "DO B",
-            "rawMsg": "DO B",
-            "nextStep": [
-              null
-            ],
-            "index": 0,
-            "type": ""
-          }
-        ],
-        "index": {
-          "0": "Point to step 0: DO B"
-        },
-        "exitSteps": [
-          "Point to step 0: DO B"
-        ]
+          "name": "Sample flow",
+          "headers": {
+              "version": "2.0",
+              "threshold": "5000"
+          },
+          "steps": [
+              { "msg": "DO B","rawMsg": "DO B","type": ""   ,"indent": 0 },
+              { "msg": ""    ,"rawMsg": ""    ,"type": "END","indent": 0 }
+          ],
+          "links": {
+              "0": [-1]
+          },
+          "leveledSteps": [ [0,1] ]
       }
-    ]
+  ];
     
-    const flows = Slimo.parse(flowText);
+    const flows = parse(flowText);
     // console.log(toSafeString(flows["Sample flow"]));
-    // console.log(JSON.stringify(flows["Sample flow 1"], null, 4));
-    expect(customDeepEqual(flows["Sample flow"],expected)).toBeTrue();
+    // console.log(JSON.stringify(flows, null, 2));
+    expect(customDeepEqual(flows,expected)).toBeTrue();
+    // expect(flows).toEqual(expected);
   });
 });
