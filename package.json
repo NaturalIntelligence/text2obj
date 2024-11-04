@@ -5,6 +5,9 @@
   "exports": {
     "./flow": "./dist/flow/flow.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "jasmine src/flow/tests/*_test.js",
     "build": "rollup -c",
