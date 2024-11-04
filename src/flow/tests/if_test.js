@@ -1,4 +1,4 @@
-const parse = require("../../flow/flow"); 
+const parse = require("../flow"); 
 const {customDeepEqual,toSafeString} = require("../../../tests/util"); 
 
 describe("Flow Parser", function() {
@@ -79,7 +79,7 @@ DO E`;
     const expected = {
       '0': [ 1 ],
       '1': [ 2, 3 ],
-      '2': [ 5 ],
+      '2': [ 7 ],
       '3': [ 4, 6 ],
       '4': [ 7 ],
       '6': [ 7 ],

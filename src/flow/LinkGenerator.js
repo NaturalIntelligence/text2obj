@@ -25,7 +25,7 @@ function isLeavingStep(step) {
  * @param {number} indent
  * @returns {number} step id
  */
-function findNextStep(steps, currentStepId, parentLoopId) {
+function findNextStep(steps, currentStepId, parentLoopId, nested) {
   let nextStepId = -2;
 
   // if(parentLoopId !== undefined && parentLoopId > currentStepId){
@@ -63,14 +63,19 @@ function findNextStep(steps, currentStepId, parentLoopId) {
   }
 
   if(nextStepId > -1 && steps[nextStepId].type.startsWith("ELSE")){
-    if(steps[currentStepId].indent === steps[nextStepId].indent
+    // IF not
+    //   but
+    // ELSE_IF else if
+    //   B
+    // ELSE
+    if(!nested && steps[currentStepId].indent === steps[nextStepId].indent
       && (steps[currentStepId].type === "IF" 
         || steps[currentStepId].type === "ELSE_IF")
       ){
-      // do nothing
+      // an IF or ELSE_IF can point to ELSE_IF or ELSE on the same indent
     }else{
       // Must not point to ELSE_IF or ELSE
-      nextStepId = findNextStep(steps,nextStepId,parentLoopId);
+      nextStepId = findNextStep(steps,nextStepId,parentLoopId, true);
     }
   }
   return nextStepId;
