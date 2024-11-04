@@ -1,17 +1,9 @@
-const commonjs = require('@rollup/plugin-commonjs');
-const json = require('@rollup/plugin-json');
-const  terser = require('@rollup/plugin-terser');
+const flowConfig = require('./src/flow/rollup.config.js');
+// import hierarchyConfig from './src/hierarchy/rollup.config.js';
+// import mindmapConfig from './src/mindmap/rollup.config.js';
 
-module.exports = {
-  input: 'src/Slimo.js',
-  output: [{
-    file: 'dist/bundle.js',
-    format: 'iife'
-  },{
-    file: 'dist/bundle.min.js',
-    format: 'iife',
-    name: 'version',
-    plugins: [terser()]
-  }],
-  plugins: [commonjs(), json()]
-};
+module.exports = [
+  flowConfig,
+  // hierarchyConfig,
+  // mindmapConfig
+];

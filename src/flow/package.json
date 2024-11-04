@@ -1,0 +1,16 @@
+{
+  "name": "@solothought/text2obj-flow",
+  "version": "1.0.0",
+  "description": "Parse text to object for diagraming, automation and other purpose",
+  "main": "./src/flow.js",
+  "scripts": {
+    "test": "jasmine tests/*_test.js",
+    "build": "rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.22.5"
+  }
+}

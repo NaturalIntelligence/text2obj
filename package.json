@@ -1,23 +1,28 @@
 {
-  "name": "slimo",
-  "version": "1.3.2",
-  "description": "construct in-memory object for a slimo flow",
-  "main": "./src/Slimo.js",
+  "name": "@solothought/text2obj",
+  "version": "1.0.0",
+  "description": "Parse text to object for diagraming, automation and other purpose",
+  "exports": {
+    "./flow": "./dist/flow/flow.js"
+  },
   "scripts": {
     "test": "jasmine tests/*_test.js",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "build:flow": "rollup -c src/flow/rollup.config.js",
+    "build:hierarchy": "rollup -c src/hierarchy/rollup.config.js",
+    "build:mindmap": "rollup -c src/mindmap/rollup.config.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NaturalIntelligence/slimo.git"
+    "url": "https://github.com/solothought/text2obj.git"
   },
-  "keywords": ["algorithm","flow"],
+  "keywords": ["algorithm","flowchart","diagrams","automation"],
   "author": "Amit Gupta (https://solothought.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NaturalIntelligence/slimo/issues"
+    "url": "https://github.com/NaturalIntelligence/text2obj/issues"
   },
-  "homepage": "https://github.com/NaturalIntelligence/slimo#readme",
+  "homepage": "https://github.com/NaturalIntelligence/text2obj#readme",
   "funding": [
     {
       "type": "github",

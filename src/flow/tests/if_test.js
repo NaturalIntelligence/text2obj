@@ -1,5 +1,5 @@
-const parse = require("../src/flow/flow"); 
-const {customDeepEqual,toSafeString} = require("./util"); 
+const parse = require("../../src/flow/flow"); 
+const {customDeepEqual,toSafeString} = require("../util"); 
 
 describe("Flow Parser", function() {
   

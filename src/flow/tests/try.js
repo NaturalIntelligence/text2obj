@@ -1,5 +1,5 @@
 const parse = require("../src/flow/flow/flow"); 
-const {customDeepEqual, toSafeString} = require("./util"); 
+const {customDeepEqual, toSafeString} = require("../util"); 
 
 describe("Flow Parser: LOOP", function() {
   it("should parse flow with loop", function() {

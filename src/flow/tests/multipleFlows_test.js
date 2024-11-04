@@ -1,5 +1,5 @@
-const parse = require("../src/flow/flow"); 
-const {customDeepEqual, toSafeString} = require("./util"); 
+const parse = require("../flow"); 
+const {customDeepEqual, toSafeString} = require("../../../tests/util"); 
 
 describe("Flow Parser: Multiple flows", function() {
   it("should parse when STOP is Ending step", function() {
