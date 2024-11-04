@@ -6,7 +6,7 @@
     "./flow": "./dist/flow/flow.js"
   },
   "scripts": {
-    "test": "jasmine tests/*_test.js",
+    "test": "jasmine src/flow/tests/*_test.js",
     "build": "rollup -c",
     "build:flow": "rollup -c src/flow/rollup.config.js",
     "build:hierarchy": "rollup -c src/hierarchy/rollup.config.js",
