@@ -2,8 +2,9 @@
   "name": "@solothought/text2obj",
   "version": "1.0.0",
   "description": "Parse text to object for diagraming, automation and other purpose",
+  "main": "src/index.js",
   "exports": {
-    "./flow": "./dist/flow/flow.js"
+    "./flow": "./src/flow/flow.js"
   },
   "publishConfig": {
     "access": "public"
