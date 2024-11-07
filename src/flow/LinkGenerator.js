@@ -26,6 +26,11 @@ function isLeavingStep(step) {
  * @returns {number} step id
  */
 function findNextStep(steps, currentStepId, parentLoopId, nested) {
+  //TODO: use leveledSteps to find the next step
+  // nextStepId = leveledSteps[steps[currentStepId].indent].indexOf(currentStepId)+1
+  // if(nextStepId === undefined) nextStepId=-1
+  // else if(steps[nextStepId].type.startsWith("ELSE")
+  //          && currentStep.type is not of same level IF block) check for next step in indent
   let nextStepId = -2;
 
   // if(parentLoopId !== undefined && parentLoopId > currentStepId){

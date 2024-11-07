@@ -1,10 +1,10 @@
 {
   "name": "@solothought/text2obj",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parse text to object for diagraming, automation and other purpose",
   "main": "src/index.js",
   "exports": {
-    "./flow": "./src/flow/flow.js"
+    "./flow": "src/flow/flow.js"
   },
   "publishConfig": {
     "access": "public"
