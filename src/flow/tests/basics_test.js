@@ -26,6 +26,22 @@ describe("Flow Parser", function() {
         // console.log(JSON.stringify(flows, null, 4));
         expect(customDeepEqual(flows,expected)).toBeTrue();
     });
+    it("should separate extra info from a step ", function() {
+        const flowText = `
+            FLOW: Sample flow 1
+            step (with) extra info((mid+1)/2)   `;
+
+        const expectedStep = [{
+            "msg": "step extra info",
+            "rawMsg": "step (with) extra info((mid+1)/2)",
+            "type": "",
+            "indent": 0
+        }];
+        
+        const flows = parse(flowText);
+        // console.log(JSON.stringify(flows, null, 4));
+        expect(flows[0].steps).toEqual(expectedStep);
+    });
   it("should parse duplicate flows", function() {
     const flowText = `
         FLOW: Sample flow
@@ -72,7 +88,7 @@ describe("Flow Parser", function() {
           },
           "leveledSteps": [ [0,1] ]
       }
-  ];
+        ];
     
     const flows = parse(flowText);
     // console.log(toSafeString(flows["Sample flow"]));

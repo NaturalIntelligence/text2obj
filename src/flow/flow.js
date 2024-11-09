@@ -123,12 +123,11 @@ function readStep(statement) {
 
     if(isSupportedKeyword(firstWord)) {
       data.type = firstWord;
-      data.rawMsg = restStatement;
-      data.msg = refinedMsg(restStatement).trim();
+      statement = restStatement;
     }else{
-      data.rawMsg = statement;
-      data.msg = refinedMsg(statement);
     }
+    data.rawMsg = statement.replace(/\s+/g," ");
+    data.msg = refinedMsg(statement).replace(/\s+/g," ");
   }
   return data;
 }
@@ -140,7 +139,18 @@ function readStep(statement) {
  * @returns {string}
  */
 function refinedMsg(msg){
-  return msg.replace(/\([^)]*\)/g, '').replace(/\s\s/g,' ');
+  let count = 0;
+  let newmsg = "";
+  for (let i = 0; i < msg.length; i++) {
+    const ch = msg[i];
+    if(ch==="(") count++;
+    else if(ch===")") count--;
+    else {
+      if(count > 0) continue;
+      else newmsg += ch;
+    }
+  }
+  return newmsg.trim();
 }
 
 function isSupportedKeyword(k){

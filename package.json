@@ -1,6 +1,6 @@
 {
   "name": "@solothought/text2obj",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Parse text to object for diagraming, automation and other purpose",
   "main": "./src/index.js",
   "exports": {
